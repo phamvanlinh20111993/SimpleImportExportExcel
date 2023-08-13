@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk-11.0.7">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="C:/Users/DELL/.m2/repository/org/apache/poi/poi/5.2.2/poi-5.2.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/DELL/.m2/repository/org/apache/poi/poi/5.2.2/poi-5.2.2-sources.jar"/>
+	<classpathentry kind="lib" path="C:/Users/DELL/.m2/repository/org/apache/poi/poi-ooxml/5.2.2/poi-ooxml-5.2.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/DELL/.m2/repository/org/apache/poi/poi-ooxml/5.2.2/poi-ooxml-5.2.2-sources.jar"/>
+	<classpathentry kind="lib" path="C:/Users/DELL/.m2/repository/mysql/mysql-connector-java/8.0.29/mysql-connector-java-8.0.29.jar"/>
+	<classpathentry kind="lib" path="C:/Users/DELL/.m2/repository/mysql/mysql-connector-java/8.0.29/mysql-connector-java-8.0.29-sources.jar"/>
+	<classpathentry kind="lib" path="C:/Users/DELL/.m2/repository/org/mapstruct/mapstruct/1.4.2.Final/mapstruct-1.4.2.Final.jar"/>
+	<classpathentry kind="lib" path="C:/Users/DELL/.m2/repository/org/mapstruct/mapstruct/1.4.2.Final/mapstruct-1.4.2.Final-sources.jar"/>
+	<classpathentry kind="lib" path="C:/Users/DELL/.m2/repository/org/apache/commons/commons-text/1.9/commons-text-1.9.jar"/>
+	<classpathentry kind="lib" path="C:/Users/DELL/Documents/apache-common-java-dependencies/commons-dbcp2-2.9.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/DELL/Documents/apache-common-java-dependencies/commons-dbcp2-2.9.0-sources.jar"/>
+	<classpathentry kind="lib" path="C:/Users/DELL/Documents/apache-common-java-dependencies/commons-pool2-2.11.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/DELL/Documents/apache-common-java-dependencies/commons-logging-1.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/DELL/Documents/apache-common-java-dependencies/commons-lang3-3.12.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/DELL/eclipse-workspace/SimpleImportExportExcel/apache-common-java-dependencies/commons-dbcp2-2.9.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/DELL/eclipse-workspace/SimpleImportExportExcel/apache-common-java-dependencies/commons-dbcp2-2.9.0-sources.jar"/>
+	<classpathentry kind="lib" path="C:/Users/DELL/eclipse-workspace/SimpleImportExportExcel/apache-common-java-dependencies/commons-lang3-3.12.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/DELL/eclipse-workspace/SimpleImportExportExcel/apache-common-java-dependencies/commons-logging-1.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/DELL/eclipse-workspace/SimpleImportExportExcel/apache-common-java-dependencies/commons-pool2-2.11.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/DELL/eclipse-workspace/SimpleImportExportExcel/apache-common-java-dependencies/commons-text-1.9.jar"/>
+	<classpathentry kind="lib" path="C:/Users/DELL/eclipse-workspace/SimpleImportExportExcel/apache-common-java-dependencies/mapstruct-1.4.2.Final.jar"/>
+	<classpathentry kind="lib" path="C:/Users/DELL/eclipse-workspace/SimpleImportExportExcel/apache-common-java-dependencies/mapstruct-1.4.2.Final-sources.jar"/>
+	<classpathentry kind="lib" path="C:/Users/DELL/eclipse-workspace/SimpleImportExportExcel/apache-common-java-dependencies/mysql-connector-java-8.0.29.jar"/>
+	<classpathentry kind="lib" path="C:/Users/DELL/eclipse-workspace/SimpleImportExportExcel/apache-common-java-dependencies/mysql-connector-java-8.0.29-sources.jar"/>
+	<classpathentry kind="lib" path="C:/Users/DELL/eclipse-workspace/SimpleImportExportExcel/apache-common-java-dependencies/poi-5.2.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/DELL/eclipse-workspace/SimpleImportExportExcel/apache-common-java-dependencies/poi-5.2.2-sources.jar"/>
+	<classpathentry kind="lib" path="C:/Users/DELL/eclipse-workspace/SimpleImportExportExcel/apache-common-java-dependencies/poi-ooxml-5.2.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/DELL/eclipse-workspace/SimpleImportExportExcel/apache-common-java-dependencies/poi-ooxml-5.2.2-sources.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
