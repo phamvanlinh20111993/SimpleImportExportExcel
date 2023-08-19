@@ -10,10 +10,11 @@ import org.apache.poi.ss.usermodel.Cell;
 import excel.importer.exception.NotMappingTableHeaderException;
 import excel.importer.utils.CellType;
 import excel.importer.utils.Utility;
+import utils.Constants;
 
 public interface TableExcelImporter {
 
-	String EMPTY = "";
+	String EMPTY = Constants.EMPTY;
 
 	Map<String, CellType> configHeader();
 
@@ -22,7 +23,12 @@ public interface TableExcelImporter {
 	Map<String, Integer> readHeader();
 
 	List<Map<String, Object>> readBody();
-
+	
+	/**
+	 * 
+	 * @param cell
+	 * @return
+	 */
 	default Optional<Object> toDataType(Cell cell) {
 
 		Optional<Object> cellData = Optional.empty();
@@ -49,7 +55,13 @@ public interface TableExcelImporter {
 
 		return cellData;
 	}
-
+	
+	/**
+	 * 
+	 * @param cell
+	 * @param cellType
+	 * @return
+	 */
 	default Optional<Object> toDataType(Cell cell, CellType cellType) {
 
 		Optional<Object> cellData = Optional.empty();

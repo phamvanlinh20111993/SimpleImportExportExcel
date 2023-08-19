@@ -5,6 +5,7 @@ import java.util.List;
 
 import database.in.annotation.Column;
 import database.in.annotation.Table;
+import utils.Constants;
 
 public interface SqlInsert<T> {
 
@@ -12,7 +13,7 @@ public interface SqlInsert<T> {
 
 	public String SPACE = " ";
 	
-	public String EMPTY = "";
+	public String EMPTY = Constants.EMPTY;
 
 	public String COMMA = ",";
 
