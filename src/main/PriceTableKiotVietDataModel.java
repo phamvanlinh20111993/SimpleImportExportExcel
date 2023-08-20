@@ -2,15 +2,26 @@ package main;
 
 import java.math.BigDecimal;
 
+import input.validation.annotation.Max;
+import input.validation.annotation.NotEmpty;
+import input.validation.annotation.NotNull;
+import input.validation.annotation.Size;
+
 public class PriceTableKiotVietDataModel {
+	
+	@Size(size=10)
+	@NotNull
 	private String goodCode;
-
+	
+	@Max(value=100)
+	@NotNull
 	private String goodName;
-
+	
+	@NotEmpty
 	private String unit;
 
 	private String goodGroup;
-
+	
 	private Double inventoryNumber;
 
 	private BigDecimal costPrice;
