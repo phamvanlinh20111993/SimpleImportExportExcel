@@ -8,9 +8,14 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import database.in.utils.TransactionIsolationLevel;
 
 public abstract class AbstractSqlInsert<R> implements SqlInsert<R> {
+	
+	private static final Logger logger = LoggerFactory.getLogger(AbstractSqlInsert.class);
 
 	protected DataSource dataSource;
 
@@ -34,7 +39,7 @@ public abstract class AbstractSqlInsert<R> implements SqlInsert<R> {
 				Object valueObject = field.get(entity);
 				setPrepareStatement(statement, valueObject, index++);
 			} catch (IllegalArgumentException | IllegalAccessException e) {
-				System.err.println(e.getMessage());
+				logger.error("extractEntity(): {}", e.getMessage());
 			}
 		}
 	}

@@ -4,7 +4,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -13,10 +12,16 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public final class Utility {
+	
+	private static final Logger logger = LoggerFactory.getLogger(Utility.class);
+
 
 	public static Date toDate(String dateStr, String pattern) throws ParseException {
 		DateFormat format = new SimpleDateFormat(pattern, Locale.ENGLISH);
@@ -30,7 +35,7 @@ public final class Utility {
 		try {
 			return mapper.readValue(jsonStr, HashMap.class);
 		} catch (JsonProcessingException e) {
-			System.out.println(e.getMessage());
+			logger.error("toMapObject(): {}", e.getMessage());
 		}
 		return new HashMap<>();
 	}

@@ -8,10 +8,15 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import database.in.utils.TransactionIsolationLevel;
 import database.in.utils.Utils;
 
 public class SimplePrepareStatementSqlInsert<T> extends AbstractSqlInsert<T> {
+	
+	private static final Logger logger = LoggerFactory.getLogger(SimplePrepareStatementSqlInsert.class);
 
 	public SimplePrepareStatementSqlInsert(DataSource dataSource) {
 		super();
@@ -46,7 +51,7 @@ public class SimplePrepareStatementSqlInsert<T> extends AbstractSqlInsert<T> {
 			rs = statement.executeUpdate();
 			conn.commit();
 		} catch (SQLException e) {
-			System.err.println(e.getMessage());
+			logger.error("SimplePrepareStatementSqlInsert.class singleInsertValue(): {}", e.getMessage());
 		} finally {
 			try {
 				if (statement != null) {
@@ -56,7 +61,7 @@ public class SimplePrepareStatementSqlInsert<T> extends AbstractSqlInsert<T> {
 					conn.close();
 				}
 			} catch (SQLException e1) {
-				System.err.println(e1.getMessage());
+				logger.error("SimplePrepareStatementSqlInsert.class singleInsertValue(): {}", e1.getMessage());
 			}
 		}
 
@@ -99,10 +104,10 @@ public class SimplePrepareStatementSqlInsert<T> extends AbstractSqlInsert<T> {
 				try {
 					conn.rollback();
 				} catch (SQLException e1) {
-					System.err.println(e1.getMessage());
+					logger.error("SimplePrepareStatementSqlInsert.class batchInsertValues(): {}", e1.getMessage());
 				}
 			}
-			System.err.println(e.getMessage());
+			logger.error("SimplePrepareStatementSqlInsert.class batchInsertValues(): {}", e.getMessage());
 		} finally {
 			try {
 				if (statement != null) {
@@ -112,7 +117,7 @@ public class SimplePrepareStatementSqlInsert<T> extends AbstractSqlInsert<T> {
 					conn.close();
 				}
 			} catch (SQLException e1) {
-				System.err.println(e1.getMessage());
+				logger.error("SimplePrepareStatementSqlInsert.class batchInsertValues(): {}", e1.getMessage());
 			}
 		}
 
