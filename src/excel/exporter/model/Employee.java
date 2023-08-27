@@ -2,7 +2,7 @@ package excel.exporter.model;
 
 import java.util.Date;
 
-import excel.exporter.HeaderName;
+import excel.exporter.annotation.HeaderName;
 
 public class Employee {
 	
@@ -18,6 +18,8 @@ public class Employee {
 	private boolean istall;
 	
 	private Date currentTime;
+	
+	private String date;
 	
 	public Employee() {
 		
@@ -70,6 +72,14 @@ public class Employee {
 
 	public void setCurrentTime(Date currentTime) {
 		this.currentTime = currentTime;
+	}
+
+	public String getDate() {
+		return date;
+	}
+
+	public void setDate(String date) {
+		this.date = date;
 	}
 
 }
