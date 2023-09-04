@@ -9,14 +9,15 @@ import java.util.Map;
 import org.apache.poi.hssf.util.HSSFColor.HSSFColorPredefined;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
 
 import excel.exporter.enums.ExcelType;
-import excel.exporter.enums.HeaderNameFormatType;
 
 public class SimpleTableExcelExporter<T extends Object> extends AbstractTableExcelExporter {
 
@@ -30,9 +31,8 @@ public class SimpleTableExcelExporter<T extends Object> extends AbstractTableExc
 		this.listData = listData;
 	}
 
-	public SimpleTableExcelExporter(String fileName, String sheetName, List<T> listData, ExcelType excelType,
-			HeaderNameFormatType formatHeaderName) {
-		super(fileName, excelType, formatHeaderName);
+	public SimpleTableExcelExporter(String fileName, String sheetName, List<T> listData, ExcelType excelType) {
+		super(fileName, excelType);
 		this.sheetName = sheetName;
 		this.listData = listData;
 	}
@@ -63,6 +63,11 @@ public class SimpleTableExcelExporter<T extends Object> extends AbstractTableExc
 		cellStyle.setBorderRight(BorderStyle.MEDIUM);
 		cellStyle.setBorderBottom(BorderStyle.MEDIUM);
 		cellStyle.setBorderLeft(BorderStyle.MEDIUM);
+		// cellStyle.setFillBackgroundColor((short) 222);
+
+		cellStyle.setFillForegroundColor(IndexedColors.LIGHT_BLUE.getIndex());
+		cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
 		// cellStyle.setWrapText(true);
 
 		cellStyles.add(cellStyle);
@@ -84,6 +89,8 @@ public class SimpleTableExcelExporter<T extends Object> extends AbstractTableExc
 		cellStyle.setBorderRight(BorderStyle.THIN);
 		cellStyle.setBorderBottom(BorderStyle.THIN);
 		cellStyle.setBorderLeft(BorderStyle.THIN);
+
+		cellStyle.setAlignment(HorizontalAlignment.CENTER);
 		// cellStyle.setWrapText(true);
 
 		cellStyles.add(cellStyle);
@@ -105,7 +112,7 @@ public class SimpleTableExcelExporter<T extends Object> extends AbstractTableExc
 	public Row configHeaderRow() {
 		Row row = this.createWorkBook().createSheet().createRow(0);
 		row.setHeight((short) 400);
-		
+
 		return row;
 	}
 

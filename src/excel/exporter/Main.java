@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.List;
 
 import excel.exporter.enums.ExcelType;
-import excel.exporter.enums.HeaderNameFormatType;
 import excel.exporter.handle.SimpleTableExcelExporter;
 import excel.exporter.model.Employee;
 
@@ -46,7 +45,7 @@ public class Main {
 		}
 
 		SimpleTableExcelExporter<Employee> excelExporter1 = new SimpleTableExcelExporter<>("employee1", "example1",
-				lists, ExcelType.XLSX, HeaderNameFormatType.UPPER);
+				lists, ExcelType.XLSX);
 
 		try {
 			excelExporter1.out("E:\\");

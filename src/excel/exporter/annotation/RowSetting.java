@@ -5,12 +5,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import excel.exporter.enums.HeaderNameFormatType;
+import excel.exporter.enums.RowType;
 
 @Retention(value = RetentionPolicy.RUNTIME)
-@Target(value = { ElementType.FIELD })
-public @interface HeaderName {
-	public String value() default "";
+@Target(value = { ElementType.TYPE })
+public @interface RowSetting {
+	public int height() default 400;
 	
-	public HeaderNameFormatType type() default HeaderNameFormatType.NORMAL;
+	public RowType type() default RowType.HEADER;
 }
