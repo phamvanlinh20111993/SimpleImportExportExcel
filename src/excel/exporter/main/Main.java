@@ -1,4 +1,4 @@
-package excel.exporter;
+package excel.exporter.main;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -8,6 +8,7 @@ import java.util.List;
 
 import excel.exporter.enums.ExcelType;
 import excel.exporter.handle.SimpleTableExcelExporter;
+import excel.exporter.handle.TableExcelExporter;
 import excel.exporter.model.Employee;
 
 public class Main {
@@ -36,7 +37,7 @@ public class Main {
 		em3.setDate(date);
 		lists.add(em3);
 
-		SimpleTableExcelExporter<Employee> excelExporter = new SimpleTableExcelExporter<>("employee", "example", lists);
+		TableExcelExporter excelExporter = new SimpleTableExcelExporter<>("employee", lists);
 
 		try {
 			excelExporter.out("E:\\");
@@ -44,8 +45,7 @@ public class Main {
 			e.printStackTrace();
 		}
 
-		SimpleTableExcelExporter<Employee> excelExporter1 = new SimpleTableExcelExporter<>("employee1", "example1",
-				lists, ExcelType.XLSX);
+		TableExcelExporter excelExporter1 = new SimpleTableExcelExporter<>("employee1", lists, ExcelType.XLSX);
 
 		try {
 			excelExporter1.out("E:\\");

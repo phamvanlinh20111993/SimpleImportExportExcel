@@ -8,10 +8,14 @@ import java.lang.annotation.Target;
 import excel.exporter.enums.RowType;
 
 @Retention(value = RetentionPolicy.RUNTIME)
-@Target(value = { ElementType.TYPE })
-public @interface RowSetting {
+@Target(value = { ElementType.FIELD, ElementType.TYPE })
+public @interface ColumnSetting {
 	
-	public short height() default 400;
+	boolean isAutoWidth() default false;
 	
-	public RowType type() default RowType.HEADER;
+	RowSetting row() default @RowSetting(type=RowType.BODY);
+	
+	short width() default (short)250;
+	
+	CellSetting cellInfo() default @CellSetting;
 }

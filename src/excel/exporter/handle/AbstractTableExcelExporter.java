@@ -4,17 +4,20 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Comment;
+import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.ClientAnchor;
+import org.apache.poi.ss.usermodel.Comment;
 import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.ss.usermodel.Drawing;
+import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.RichTextString;
@@ -25,6 +28,11 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import excel.exporter.config.CellInfo;
+import excel.exporter.config.ColumnInfo;
+import excel.exporter.config.HeaderInfo;
+import excel.exporter.config.SheetInfo;
+import excel.exporter.config.SheetInfoSetting;
 import excel.exporter.enums.ExcelType;
 import excel.exporter.enums.HeaderNameFormatType;
 
@@ -40,6 +48,8 @@ public abstract class AbstractTableExcelExporter implements TableExcelExporter {
 
 	private Integer initialRowIndex = 0;
 
+	protected List<SheetInfoSetting> sheetInfoSettings;
+
 	public AbstractTableExcelExporter(String fileName) {
 		this.fileName = fileName;
 		this.workbook = createWorkBook();
@@ -51,48 +61,88 @@ public abstract class AbstractTableExcelExporter implements TableExcelExporter {
 		this.workbook = createWorkBook();
 	}
 
-	protected void createHeader(Sheet sheet, CellStyle cellStyle, List<String> headerNames) {
+	protected void createHeader(Sheet sheet, List<HeaderInfo> headerInfos) {
 		Row rowHead = sheet.createRow(initialRowIndex);
-		rowHead = cloneRowSetting(rowHead, this.configHeaderRow());
-
 		int cellIndex = 0;
 
-		for (String headerName : headerNames) {
-			Cell cell = rowHead.createCell(cellIndex++);
-			cell.setCellStyle(cellStyle);
-			cell.setCellValue(headerName);
+		for (HeaderInfo headerInfo : headerInfos) {
+			Cell cell = rowHead.createCell(cellIndex);
+			HeaderNameFormatType headerNameFormatType = headerInfo.getName().getType();
+			cell.setCellValue(headerNameFormatType.changeFormatType(headerInfo.getName().getValue()));
+			cell.setCellStyle(setCellStyle(headerInfo.getCellInfo()));
+			if (headerInfo.isAutoWidth()) {
+				sheet.autoSizeColumn(cellIndex);
+			} else {
+				sheet.setColumnWidth(cellIndex, headerInfo.getWidth());
+			}
+			rowHead.setHeight(headerInfo.getRow().getHeight());
+			cellIndex++;
 		}
-
 	}
 
-	protected void createBody(Sheet sheet, CellStyle cellStyle, List<String> headerNames, List<Object> data)
+	protected CellStyle setCellStyle(CellInfo cellInfo) {
+		CellStyle cellStyle = this.getWorkbook().createCellStyle();
+
+		Font font = this.getWorkbook().createFont();
+		font.setBold(cellInfo.getFontSetting().isBold());
+		font.setColor(cellInfo.getFontSetting().getColor());
+		font.setFontName(cellInfo.getFontSetting().getName());
+		font.setFontHeightInPoints(cellInfo.getFontSetting().getSize());
+
+		cellStyle.setFont(font);
+		cellStyle.setAlignment(cellInfo.getHorizontalAlignment());
+		cellStyle.setVerticalAlignment(cellInfo.getVerticalAlignment());
+		
+		cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+		
+		cellStyle.setBorderLeft(BorderStyle.THIN);
+		cellStyle.setLeftBorderColor(IndexedColors.BLACK.index);
+		cellStyle.setBorderTop(BorderStyle.THIN);
+		cellStyle.setTopBorderColor(IndexedColors.BLACK.index);
+		cellStyle.setBorderBottom(BorderStyle.THIN);
+		cellStyle.setBottomBorderColor(IndexedColors.BLACK.index);
+		cellStyle.setBorderRight(BorderStyle.THIN);
+		cellStyle.setRightBorderColor(IndexedColors.BLACK.index);
+
+		if (cellInfo.getBackgroundColor() > 0) {
+			cellStyle.setFillBackgroundColor(cellInfo.getBackgroundColor());
+			cellStyle.setFillForegroundColor(cellInfo.getBackgroundColor());
+		} else {
+			cellStyle.setFillBackgroundColor(cellInfo.getBackgroundRGBColor().getIndex());
+			cellStyle.setFillForegroundColor(cellInfo.getBackgroundRGBColor().getIndex());
+		}
+
+		return cellStyle;
+	}
+
+	protected void createBody(Sheet sheet, List<ColumnInfo> columnInfos, List<Object> data)
 			throws IllegalArgumentException, IllegalAccessException {
 
 		int rowIndex = ++initialRowIndex;
 
 		for (Object rowData : data) {
 			Row row = sheet.createRow(rowIndex++);
-			row = cloneRowSetting(row, this.configBodyRow());
-
 			Map<String, Object> mapData = objectToMap(rowData);
+			List<Object> listValues = new LinkedList<Object>(mapData.values());
 
 			int cellInd = 0;
-			for (Map.Entry<String, Object> rowIndexData : mapData.entrySet()) {
-				Cell cell = row.createCell(cellInd++);
-				cell.setCellStyle(cellStyle);
-				setCellValue(cell, rowIndexData.getValue());
-				sheet.autoSizeColumn(cellInd);
+
+			for (ColumnInfo columnInfo : columnInfos) {
+				row.setHeight(columnInfo.getRow().getHeight());
+				Cell cell = row.createCell(cellInd);
+				cell.setCellStyle(setCellStyle(columnInfo.getCellInfo()));
+				setCellValue(cell, listValues.get(cellInd++));
+				if (columnInfo.isAutoWidth()) {
+					sheet.autoSizeColumn(cellInd);
+				} else {
+					sheet.setColumnWidth(cellInd, columnInfo.getWidth());
+				}
+				cellInd++;
 			}
 		}
 	}
 
-	public Workbook export() {
-
-		Map<String, Sheet> sheets = this.configSheets();
-
-		List<CellStyle> headers = this.configHeader();
-
-		List<CellStyle> bodies = this.configBody();
+	public Workbook executeExport() {
 
 		List<List<Object>> data = this.getData();
 
@@ -102,21 +152,21 @@ public abstract class AbstractTableExcelExporter implements TableExcelExporter {
 
 		List<Integer> sheetsRemove = new ArrayList<>();
 
-		for (Map.Entry<String, Sheet> entry : sheets.entrySet()) {
-			Sheet sheet = this.workbook.createSheet(entry.getKey());
+		for (SheetInfoSetting sheetInfoSetting : sheetInfoSettings) {
+
+			SheetInfo sheetInfo = sheetInfoSetting.getSheetInfo();
+
+			Sheet sheet = this.workbook.createSheet(sheetInfo.getName());
+			sheet.setDisplayGridlines(sheetInfo.isDisplayGrid());
+
 			try {
-				cloneSheetSetting(sheet, entry.getValue());
 				List<Object> listRows = data.get(ind);
 				if (listRows.isEmpty()) {
 					sheetsRemove.add(ind);
 					continue;
 				}
-
-				List<String> headerNames = this.getHeaderName(listRows.get(ind));
-
-				createHeader(sheet, headers.get(ind), headerNames);
-
-				createBody(sheet, bodies.get(ind), headerNames, listRows);
+				createHeader(sheet, sheetInfoSetting.getHeaderInfos());
+				createBody(sheet, sheetInfoSetting.getColumnInfos(), listRows);
 
 			} catch (IllegalArgumentException | IllegalAccessException e) {
 				System.err.println(AbstractTableExcelExporter.class.getName() + "  export() error: " + e.getMessage());
@@ -131,10 +181,8 @@ public abstract class AbstractTableExcelExporter implements TableExcelExporter {
 	}
 
 	protected void removeSheets(List<Integer> sheetsRemove) {
-
 		if (CollectionUtils.isEmpty(sheetsRemove))
 			return;
-
 		for (int ind = sheetsRemove.size(); ind >= 0; ind++) {
 			this.workbook.removeSheetAt(ind);
 		}
@@ -144,43 +192,14 @@ public abstract class AbstractTableExcelExporter implements TableExcelExporter {
 		return excelType.equals(ExcelType.XLSX) ? new XSSFWorkbook() : new HSSFWorkbook();
 	}
 
+	@Override
 	public void out(String path) throws IOException {
-		this.export();
+		this.executeExport();
 		String exportPath = path + "\\" + this.fileName + "." + excelType.getTypeValue();
 		OutputStream fileOut = new FileOutputStream(exportPath);
 		System.out.println("Excel File has been created successfully " + exportPath);
 		logger.debug("Excel File has been created successfully {}", exportPath);
 		workbook.write(fileOut);
-	}
-
-	protected Sheet cloneSheetSetting(Sheet currentSheet, Sheet cloneSheet) {
-
-		if (cloneSheet == null)
-			return currentSheet;
-
-		currentSheet.setDefaultRowHeight(cloneSheet.getDefaultRowHeight());
-		currentSheet.setDisplayGridlines(cloneSheet.isDisplayGridlines());
-		currentSheet.setDefaultColumnWidth(cloneSheet.getDefaultColumnWidth());
-		currentSheet.setVerticallyCenter(cloneSheet.getVerticallyCenter());
-		currentSheet.setHorizontallyCenter(cloneSheet.getHorizontallyCenter());
-		// TODO need time to call all method
-		// ..
-
-		return currentSheet;
-	}
-
-	protected Row cloneRowSetting(Row currentRow, Row cloneRow) {
-
-		if (cloneRow == null)
-			return currentRow;
-
-		currentRow.setHeight(cloneRow.getHeight());
-		currentRow.setHeightInPoints(cloneRow.getHeightInPoints());
-		currentRow.setRowStyle(cloneRow.getRowStyle());
-		// TODO need time to call all method
-		// ..
-
-		return currentRow;
 	}
 
 	public Workbook getWorkbook() {
@@ -206,7 +225,7 @@ public abstract class AbstractTableExcelExporter implements TableExcelExporter {
 
 		comment.setString(richTextStr);
 		comment.setAuthor(author);
-		
+
 		return comment;
 	}
 }

@@ -9,20 +9,17 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
 public interface ExcelExporter {
-
-	public Map<String, Sheet> configSheets();
-
+	
 	public List<List<Object>> getData();
 	
-	public Workbook export();
+	public Workbook executeExport();
 
 	default Map<String, Object> objectToMap(Object data) throws IllegalArgumentException, IllegalAccessException {
 		Map<String, Object> objectData = new LinkedHashMap<>();
-
+		
 		Field[] fields = data.getClass().getDeclaredFields();
 		for (Field field : fields) {
 			field.setAccessible(true);

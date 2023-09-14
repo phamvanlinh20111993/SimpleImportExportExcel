@@ -6,7 +6,14 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Retention(value = RetentionPolicy.RUNTIME)
-@Target(value = { ElementType.FIELD })
-public @interface HeaderComment {
-	public String value() default "";
+@Target(value = { ElementType.TYPE })
+public @interface SheetSetting {
+	
+	String name() default "";
+	
+	boolean isFitToPage() default true;
+	
+	boolean isDisplayGrid() default true;
+	
+	Font font() default @Font;
 }

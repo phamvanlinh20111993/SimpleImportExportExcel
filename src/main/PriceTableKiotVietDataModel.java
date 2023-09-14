@@ -2,36 +2,46 @@ package main;
 
 import java.math.BigDecimal;
 
+import excel.importer.annotation.MappingHeader;
+import excel.importer.utils.CellType;
 import input.validation.annotation.Max;
 import input.validation.annotation.NotEmpty;
 import input.validation.annotation.NotNull;
 import input.validation.annotation.Size;
 
 public class PriceTableKiotVietDataModel {
-	
-	@Size(size=10)
+
+	@Size(size = 10)
 	@NotNull
+	@MappingHeader(value = "Mã hàng", type = CellType.STRING)
 	private String goodCode;
-	
-	@Max(value=100)
+
+	@Max(value = 100)
 	@NotNull
+	@MappingHeader(value = "Tên hàng", type = CellType.STRING)
 	private String goodName;
-	
+
 	@NotEmpty
+	@MappingHeader(value = "Đơn vị tính", type = CellType.STRING)
 	private String unit;
 
+	@MappingHeader(value = "Nhóm hàng", type = CellType.STRING)
 	private String goodGroup;
-	
+
+	@MappingHeader(value = "Tồn kho", type = CellType.DOUBLE)
 	private Double inventoryNumber;
 
+	@MappingHeader(value = "Giá vốn", type = CellType.DOUBLE)
 	private BigDecimal costPrice;
 
+	@MappingHeader(value = "Giá nhập cuối", type = CellType.DOUBLE)
 	private BigDecimal lastCostPrice;
 
+	@MappingHeader(value = "Giá chung", type = CellType.DOUBLE)
 	private BigDecimal marketCostPrice;
 
-	public PriceTableKiotVietDataModel(String goodCode, String goodName, String unit, String goodGroup, Double inventoryNumber,
-			BigDecimal costPrice, BigDecimal lastCostPrice, BigDecimal marketCostPrice) {
+	public PriceTableKiotVietDataModel(String goodCode, String goodName, String unit, String goodGroup,
+			Double inventoryNumber, BigDecimal costPrice, BigDecimal lastCostPrice, BigDecimal marketCostPrice) {
 		super();
 		this.goodCode = goodCode;
 		this.goodName = goodName;

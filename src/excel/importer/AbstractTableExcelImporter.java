@@ -1,7 +1,10 @@
 package excel.importer;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -18,7 +21,7 @@ import excel.importer.utils.CellType;
 
 public abstract class AbstractTableExcelImporter implements TableExcelImporter {
 
-	private Sheet sheet;
+	protected Sheet sheet;
 
 	public AbstractTableExcelImporter(Sheet sheet) {
 		super();
@@ -31,7 +34,7 @@ public abstract class AbstractTableExcelImporter implements TableExcelImporter {
 		Map<String, CellType> configHeader = this.configHeader();
 
 		if (headers.size() != configHeader.size()) {
-			throw new NotMappingTableHeaderException("is not mapping header size");
+			throw new NotMappingTableHeaderException(" is not mapping header size");
 		}
 
 		Set<String> notStrictconfigHeader = configHeader.keySet().stream().map(v -> v.toLowerCase())
@@ -39,22 +42,26 @@ public abstract class AbstractTableExcelImporter implements TableExcelImporter {
 
 		for (String headerVal : headers.keySet()) {
 			if (!notStrictconfigHeader.contains(headerVal.toLowerCase())) {
-				throw new NotMappingTableHeaderException(headerVal + "is not exist in your config header");
+				throw new NotMappingTableHeaderException(headerVal + " is not exist in your config header");
 			}
 		}
 
 		if (isStrictFormat) {
 			for (String headerVal : headers.keySet()) {
 				if (!configHeader.keySet().contains(headerVal)) {
-					throw new NotMappingTableHeaderException(headerVal + "is not valid format");
+					throw new NotMappingTableHeaderException(headerVal + " is not valid format");
 				}
 			}
 
-			List<Integer> indexs = (List<Integer>) headers.values();
+			List<Integer> indexs = new LinkedList<Integer>();
+			for (Integer index : headers.values()) {
+				indexs.add(index);
+			}
+
 			int index = indexs.get(0);
-			for (int ind = 1; ind < indexs.size(); ind++) {
-				if (index + 1 != indexs.get(ind)) {
-					throw new HeaderColumnException("not valid index at column header index");
+			for (int ind = 0; ind < indexs.size(); ind++) {
+				if (index++ != indexs.get(ind)) {
+					throw new HeaderColumnException(" not valid index at column header index " + index);
 				}
 			}
 
@@ -64,7 +71,7 @@ public abstract class AbstractTableExcelImporter implements TableExcelImporter {
 
 	public Map<String, Integer> readHeader() {
 		Row firstRow = sheet.getRow(0);
-		Map<String, Integer> headerFields = new HashMap<>();
+		Map<String, Integer> headerFields = new LinkedHashMap<>();
 
 		for (Cell cell : firstRow) {
 			headerFields.put(toDataType(cell).get().toString(), cell.getColumnIndex());
@@ -73,7 +80,7 @@ public abstract class AbstractTableExcelImporter implements TableExcelImporter {
 	}
 
 	public List<Map<String, Object>> readBody() {
-		
+
 		Map<String, Integer> headers = this.readHeader();
 
 		Map<String, CellType> configHeaders = this.configHeader();
@@ -103,5 +110,10 @@ public abstract class AbstractTableExcelImporter implements TableExcelImporter {
 		}
 
 		return rowDatas;
+	}
+
+	public List<Map<String, Object>> read(boolean isStrict) {
+		validationFormat(isStrict);
+		return readBody();
 	}
 }
