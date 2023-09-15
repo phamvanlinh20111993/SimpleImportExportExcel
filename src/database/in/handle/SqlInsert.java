@@ -12,7 +12,7 @@ public interface SqlInsert<T> {
 	public String INSERT_VALUE_KEY = "VALUES";
 
 	public String SPACE = " ";
-	
+
 	public String EMPTY = Constants.EMPTY;
 
 	public String COMMA = ",";
@@ -20,14 +20,14 @@ public interface SqlInsert<T> {
 	public String OPEN_PARENTHESIS = "(";
 
 	public String CLOSE_PARENTHESIS = ")";
-	
+
 	/**
 	 * 
 	 * @param entity
 	 * @return
 	 */
 	public String singleInsertValue(T entity);
-	
+
 	/**
 	 * 
 	 * @param entities

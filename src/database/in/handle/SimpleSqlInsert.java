@@ -118,8 +118,8 @@ public class SimpleSqlInsert<T> extends AbstractSqlInsert<T> {
 		if (result != null) {
 			return "inserted " + Utils.sum(result);
 		}
-		
-		if(isForceInsert) {
+
+		if (isForceInsert) {
 			return "still insert despite some error";
 		}
 

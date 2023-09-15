@@ -1,7 +1,7 @@
 package database.in.utils;
 
 public final class Utils {
-	
+
 	/**
 	 * 
 	 * @param arg

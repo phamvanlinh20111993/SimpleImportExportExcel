@@ -7,6 +7,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import excel.exporter.annotation.ColumnSetting;
 import excel.exporter.annotation.Font;
@@ -14,17 +20,47 @@ import excel.exporter.annotation.HeaderName;
 import excel.exporter.annotation.HeaderSetting;
 import excel.exporter.annotation.RowSetting;
 import excel.exporter.annotation.SheetSetting;
+import excel.exporter.config.CellInfo;
 import excel.exporter.config.ColumnInfo;
 import excel.exporter.config.FontInfo;
 import excel.exporter.config.HeaderInfo;
 import excel.exporter.config.RowInfo;
 import excel.exporter.config.SheetInfo;
 import excel.exporter.config.SheetInfoSetting;
+import utils.Constants;
+import utils.ObjectUtils;
 
 public interface TableExcelExporter extends ExcelExporter {
 
+	Logger logger = LoggerFactory.getLogger(TableExcelExporter.class);
+
+	/**
+	 * 
+	 * @param path
+	 * @throws IOException
+	 */
 	void out(String path) throws IOException;
 
+	/**
+	 * 
+	 * @return
+	 */
+	CellStyle defaultHeaderSetting();
+
+	/**
+	 * 
+	 * @return
+	 */
+	CellStyle defaultColumnSetting();
+
+	/**
+	 * Convert annotation to object. the annotation field must be mapping with
+	 * object field
+	 * 
+	 * @param obj
+	 * @param annotation
+	 * @return
+	 */
 	default Object convertAnnotationToConcreteObject(Object obj, Annotation annotation) {
 
 		Method[] methods = annotation.annotationType().getDeclaredMethods();
@@ -38,20 +74,33 @@ public interface TableExcelExporter extends ExcelExporter {
 
 				if (method.getReturnType().isAnnotation()) {
 					Annotation nestedAnnotation = (Annotation) value;
-					nameField.set(obj, convertAnnotationToConcreteObject(obj, nestedAnnotation));
+
+					Optional<Object> instance = ObjectUtils
+							.createInstanceFromPackage(Constants.EXCEL_EXPORT_POJO_PACKAGE_NAME, nameField.getType());
+
+					if (instance.isPresent()) {
+						nameField.set(obj, convertAnnotationToConcreteObject(instance.get(), nestedAnnotation));
+					}
 					continue;
 				}
 				nameField.set(obj, value);
 
 			} catch (NoSuchFieldException | IllegalArgumentException | IllegalAccessException
 					| InvocationTargetException e) {
-				System.err.println("Error " + e.getMessage());
+				System.err.println("Error TableExcelExporter.convertAnnotationToConcreteObject() " + e.getMessage());
+				logger.error("Got error: TableExcelExporter.convertAnnotationToConcreteObject() {}", e.getMessage());
 			}
 		}
 
 		return obj;
 	}
 
+	/**
+	 * convert annotation setting to POJO object setting
+	 * 
+	 * @param obj
+	 * @return
+	 */
 	default SheetInfoSetting toSheetInfo(Object obj) {
 
 		SheetInfoSetting sheetInfoSetting = new SheetInfoSetting();
@@ -63,24 +112,81 @@ public interface TableExcelExporter extends ExcelExporter {
 		SheetInfo sheetInfo = new SheetInfo();
 
 		Field[] fields = obj.getClass().getDeclaredFields();
+		// init data
+		for (int index = 0; index < fields.length; index++) {
+			columnInfos.add(new ColumnInfo());
+			headerInfos.add(new HeaderInfo());
+		}
 
 		if (obj.getClass().isAnnotationPresent(SheetSetting.class)) {
 			sheetInfo = toSheetInfo(obj.getClass().getAnnotation(SheetSetting.class));
 		}
 
+		HeaderInfo headerInfoDefault = new HeaderInfo();
+
+		ColumnInfo columnInfoDefault = new ColumnInfo();
+
+		FontInfo fontInfoDefault = new FontInfo();
+
+		// defined annotation at class level
+		if (obj.getClass().isAnnotationPresent(HeaderSetting.class)) {
+			headerInfoDefault = toHeaderInfo(obj.getClass().getAnnotation(HeaderSetting.class));
+			for (int index = 0; index < fields.length; index++) {
+				headerInfos.set(index, headerInfoDefault);
+			}
+		}
+
+		if (obj.getClass().isAnnotationPresent(ColumnSetting.class)) {
+			columnInfoDefault = toColumnInfo(obj.getClass().getAnnotation(ColumnSetting.class));
+			for (int index = 0; index < fields.length; index++) {
+				columnInfos.set(index, columnInfoDefault);
+			}
+		}
+
+		if (obj.getClass().isAnnotationPresent(Font.class)) {
+			fontInfoDefault = toFontInfo(obj.getClass().getAnnotation(Font.class));
+			for (int index = 0; index < fields.length; index++) {
+				CellInfo cellInfoColumn = new CellInfo();
+				cellInfoColumn.setFont(fontInfoDefault);
+				columnInfos.get(index).setCellInfo(cellInfoColumn);
+
+				CellInfo cellInfoHeader = new CellInfo();
+				cellInfoHeader.setFont(fontInfoDefault);
+				headerInfos.get(index).setCellInfo(cellInfoHeader);
+			}
+		}
+
+		// defined annotation at field level
+		int index = 0;
 		for (Field field : fields) {
 			field.setAccessible(true);
 			String name = field.getName();
 			if (field.isAnnotationPresent(ColumnSetting.class)) {
-				columnInfos.add(toColumnInfo(field.getAnnotation(ColumnSetting.class)));
+				columnInfos.set(index, toColumnInfo(field.getAnnotation(ColumnSetting.class)));
 			}
+
 			if (field.isAnnotationPresent(HeaderSetting.class)) {
-				headerInfos.add(toHeaderInfo(field.getAnnotation(HeaderSetting.class)));
-			} else {
-				HeaderInfo headerInfo = new HeaderInfo();
-				headerInfo.setName(new excel.exporter.config.HeaderName(name));
-				headerInfos.add(new HeaderInfo());
+				headerInfos.set(index, toHeaderInfo(field.getAnnotation(HeaderSetting.class)));
 			}
+
+			/**
+			 * detect if header value is empty
+			 */
+			if (headerInfos.get(index).getName() == null
+					|| StringUtils.isAllEmpty(headerInfos.get(index).getName().getValue())) {
+				HeaderInfo headerInfo = headerInfos.get(index);
+				excel.exporter.config.HeaderName headerName = new excel.exporter.config.HeaderName();
+				if (field.isAnnotationPresent(HeaderName.class)) {
+					headerName = toHeaderName(field.getAnnotation(HeaderName.class));
+					// we dont have any setting, auto get header name is class property
+				} else {
+					headerName.setValue(name);
+				}
+				headerInfo.setName(headerName);
+				headerInfos.set(index, headerInfo);
+			}
+
+			index++;
 		}
 
 		sheetInfoSetting.setSheetInfo(sheetInfo);
@@ -90,29 +196,65 @@ public interface TableExcelExporter extends ExcelExporter {
 		return sheetInfoSetting;
 	}
 
+	/**
+	 * 
+	 * @param columnInfoAno
+	 * @return
+	 */
 	default ColumnInfo toColumnInfo(ColumnSetting columnInfoAno) {
-		return (ColumnInfo) convertAnnotationToConcreteObject(new ColumnInfo(), columnInfoAno);
+		ColumnInfo columnInfo = (ColumnInfo) convertAnnotationToConcreteObject(new ColumnInfo(), columnInfoAno);
+		return columnInfo;
 	}
 
+	/**
+	 * 
+	 * @param headerSetting
+	 * @return
+	 */
 	default HeaderInfo toHeaderInfo(HeaderSetting headerSetting) {
-		return (HeaderInfo) convertAnnotationToConcreteObject(new HeaderInfo(), headerSetting);
+		HeaderInfo headerInfo = (HeaderInfo) convertAnnotationToConcreteObject(new HeaderInfo(), headerSetting);
+		return headerInfo;
 	}
 
+	/**
+	 * 
+	 * @param headerName
+	 * @return
+	 */
 	default excel.exporter.config.HeaderName toHeaderName(HeaderName headerName) {
-		return (excel.exporter.config.HeaderName) convertAnnotationToConcreteObject(
+		excel.exporter.config.HeaderName headerNameSetting = (excel.exporter.config.HeaderName) convertAnnotationToConcreteObject(
 				new excel.exporter.config.HeaderName(), headerName);
+		return headerNameSetting;
 	}
 
+	/**
+	 * 
+	 * @param fontAno
+	 * @return
+	 */
 	default FontInfo toFontInfo(Font fontAno) {
-		return (FontInfo) convertAnnotationToConcreteObject(new FontInfo(), fontAno);
+		FontInfo fontInfo = (FontInfo) convertAnnotationToConcreteObject(new FontInfo(), fontAno);
+		return fontInfo;
 	}
 
+	/**
+	 * 
+	 * @param rowSetting
+	 * @return
+	 */
 	default RowInfo toRowSetting(RowSetting rowSetting) {
-		return (RowInfo) convertAnnotationToConcreteObject(new RowInfo(), rowSetting);
+		RowInfo rowInfo = (RowInfo) convertAnnotationToConcreteObject(new RowInfo(), rowSetting);
+		return rowInfo;
 	}
 
+	/**
+	 * 
+	 * @param sheetSetting
+	 * @return
+	 */
 	default SheetInfo toSheetInfo(SheetSetting sheetSetting) {
-		return (SheetInfo) convertAnnotationToConcreteObject(new SheetInfo(), sheetSetting);
+		SheetInfo sheetInfo = (SheetInfo) convertAnnotationToConcreteObject(new SheetInfo(), sheetSetting);
+		return sheetInfo;
 	}
 
 }

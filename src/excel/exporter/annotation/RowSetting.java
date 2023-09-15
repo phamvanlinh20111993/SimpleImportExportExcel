@@ -10,8 +10,8 @@ import excel.exporter.enums.RowType;
 @Retention(value = RetentionPolicy.RUNTIME)
 @Target(value = { ElementType.TYPE })
 public @interface RowSetting {
-	
+
 	public short height() default 400;
-	
+
 	public RowType type() default RowType.HEADER;
 }

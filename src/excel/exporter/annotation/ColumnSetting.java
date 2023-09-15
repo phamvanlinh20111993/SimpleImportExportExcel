@@ -10,12 +10,15 @@ import excel.exporter.enums.RowType;
 @Retention(value = RetentionPolicy.RUNTIME)
 @Target(value = { ElementType.FIELD, ElementType.TYPE })
 public @interface ColumnSetting {
-	
+
 	boolean isAutoWidth() default false;
-	
-	RowSetting row() default @RowSetting(type=RowType.BODY);
-	
-	short width() default (short)250;
-	
+
+	RowSetting row() default @RowSetting(type = RowType.BODY);
+
+	short width() default (short) 250;
+
 	CellSetting cellInfo() default @CellSetting;
+
+	// TODO
+	String moreConfig() default "";
 }

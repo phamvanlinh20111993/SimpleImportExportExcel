@@ -12,14 +12,29 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Workbook;
 
 public interface ExcelExporter {
-	
+
+	/**
+	 * 
+	 * @return
+	 */
 	public List<List<Object>> getData();
-	
+
+	/**
+	 * 
+	 * @return
+	 */
 	public Workbook executeExport();
 
+	/**
+	 * 
+	 * @param data
+	 * @return
+	 * @throws IllegalArgumentException
+	 * @throws IllegalAccessException
+	 */
 	default Map<String, Object> objectToMap(Object data) throws IllegalArgumentException, IllegalAccessException {
 		Map<String, Object> objectData = new LinkedHashMap<>();
-		
+
 		Field[] fields = data.getClass().getDeclaredFields();
 		for (Field field : fields) {
 			field.setAccessible(true);
@@ -30,6 +45,11 @@ public interface ExcelExporter {
 		return objectData;
 	}
 
+	/**
+	 * 
+	 * @param cell
+	 * @param value
+	 */
 	default void setCellValue(Cell cell, Object value) {
 
 		if (value instanceof Boolean) {

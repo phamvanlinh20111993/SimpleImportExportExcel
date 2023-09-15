@@ -10,8 +10,8 @@ import excel.importer.utils.CellType;
 @Retention(value = RetentionPolicy.RUNTIME)
 @Target(value = { ElementType.FIELD })
 public @interface MappingHeader {
-	
+
 	String value() default "";
-	
+
 	CellType type() default CellType.STRING;
 }

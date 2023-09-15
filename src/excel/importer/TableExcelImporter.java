@@ -23,7 +23,7 @@ public interface TableExcelImporter {
 	Map<String, Integer> readHeader();
 
 	List<Map<String, Object>> readBody();
-	
+
 	/**
 	 * 
 	 * @param cell
@@ -55,7 +55,7 @@ public interface TableExcelImporter {
 
 		return cellData;
 	}
-	
+
 	/**
 	 * 
 	 * @param cell

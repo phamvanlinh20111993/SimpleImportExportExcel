@@ -19,9 +19,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public final class Utility {
-	
-	private static final Logger logger = LoggerFactory.getLogger(Utility.class);
 
+	private static final Logger logger = LoggerFactory.getLogger(Utility.class);
 
 	public static Date toDate(String dateStr, String pattern) throws ParseException {
 		DateFormat format = new SimpleDateFormat(pattern, Locale.ENGLISH);
@@ -41,7 +40,7 @@ public final class Utility {
 	}
 
 	/**
-	 * the valid format is:  "[1,2,3,'4',5,6,"7",8, "hello friend"]"
+	 * the valid format is: "[1,2,3,'4',5,6,"7",8, "hello friend"]"
 	 * 
 	 * @param arrStr
 	 * @return
@@ -64,13 +63,11 @@ public final class Utility {
 		Matcher m = p.matcher(arrStr);
 
 		while (m.find()) {
-			if(m.group(2) != null) {
-				datas.add(m.group(2).trim()
-						.replaceAll("^('|\")", "")
-						.replaceAll("('|\")$", ""));
+			if (m.group(2) != null) {
+				datas.add(m.group(2).trim().replaceAll("^('|\")", "").replaceAll("('|\")$", ""));
 			}
 		}
-		
+
 		return datas;
 	}
 

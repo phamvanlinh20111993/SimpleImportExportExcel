@@ -56,9 +56,10 @@ public class MaxValidation<T> implements ValidationHandler<T> {
 		return new ErrorDetail(MinValidation.class.getCanonicalName(), "The max length must be " + maxValue);
 	}
 
-//	@Override
-//	public void validate(T value) throws ValidationError {
-//		if(!this.isValid(value)) throw new ValidationError(MaxValidation.class, "The max value only " + maxValue);	
-//	}
+	// @Override
+	// public void validate(T value) throws ValidationError {
+	// if(!this.isValid(value)) throw new ValidationError(MaxValidation.class, "The
+	// max value only " + maxValue);
+	// }
 
 }

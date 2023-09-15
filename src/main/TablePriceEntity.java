@@ -30,6 +30,5 @@ public class TablePriceEntity {
 
 	@Column(name = "market_cost_price")
 	private BigDecimal marketCostPrice;
-	
-	
+
 }

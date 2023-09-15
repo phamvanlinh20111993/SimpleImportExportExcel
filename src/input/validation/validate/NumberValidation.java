@@ -12,10 +12,10 @@ public class NumberValidation<T> extends TypeStringDataValidation<T> {
 
 	@Override
 	public boolean isValid(T data) {
-		
+
 		if (!super.isValid(data))
 			return false;
-		
+
 		if (!data.toString().matches(NUMBER_PATTERN)) {
 			return false;
 		}
@@ -28,7 +28,8 @@ public class NumberValidation<T> extends TypeStringDataValidation<T> {
 	}
 
 	public ErrorDetail getErrorCause() {
-		return new ErrorDetail(this.getClass().getCanonicalName(), "Not matching pattern " + (pattern.equals("") ? NUMBER_PATTERN : pattern));
+		return new ErrorDetail(this.getClass().getCanonicalName(),
+				"Not matching pattern " + (pattern.equals("") ? NUMBER_PATTERN : pattern));
 	}
 
 }

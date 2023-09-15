@@ -1,5 +1,6 @@
 package excel.exporter.config;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.poi.xssf.usermodel.XSSFColor;
 
 import lombok.Data;
@@ -28,5 +29,10 @@ public class FontInfo {
 			rgb[2] = Byte.parseByte(rgbStr[2]);
 		}
 		return new XSSFColor(rgb);
+	}
+
+	@Override
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this);
 	}
 }

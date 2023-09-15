@@ -15,7 +15,7 @@ import database.in.utils.TransactionIsolationLevel;
 import database.in.utils.Utils;
 
 public class SimplePrepareStatementSqlInsert<T> extends AbstractSqlInsert<T> {
-	
+
 	private static final Logger logger = LoggerFactory.getLogger(SimplePrepareStatementSqlInsert.class);
 
 	public SimplePrepareStatementSqlInsert(DataSource dataSource) {

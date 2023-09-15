@@ -1,5 +1,7 @@
 package excel.exporter.config;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 import excel.exporter.enums.RowType;
 import lombok.Data;
 
@@ -8,4 +10,9 @@ public class RowInfo {
 	private short height;
 
 	private RowType type;
+
+	@Override
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this);
+	}
 }

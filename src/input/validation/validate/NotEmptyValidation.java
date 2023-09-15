@@ -9,8 +9,9 @@ public class NotEmptyValidation<T> implements ValidationHandler<T> {
 
 	@Override
 	public boolean isValid(T data) {
-		
-		if(data == null) return false;
+
+		if (data == null)
+			return false;
 
 		if (data instanceof String) {
 			return ((String) data).length() > 0;

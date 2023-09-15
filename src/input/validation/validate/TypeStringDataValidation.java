@@ -9,12 +9,12 @@ public abstract class TypeStringDataValidation<T> implements ValidationHandler<T
 	public TypeStringDataValidation(String pattern) {
 		this.pattern = pattern;
 	}
-	
+
 	public boolean isValid(T value) {
-		if(value == null || !(value instanceof String)) {
+		if (value == null || !(value instanceof String)) {
 			return false;
 		}
-		
+
 		return true;
 	}
 

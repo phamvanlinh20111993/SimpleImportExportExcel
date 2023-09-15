@@ -1,9 +1,9 @@
 package input.validation.utils;
 
 public final class Utils {
-	
+
 	public static final Number toRealNumber(Number num) {
-		
+
 		if (num instanceof Long) {
 			return num.longValue();
 		}

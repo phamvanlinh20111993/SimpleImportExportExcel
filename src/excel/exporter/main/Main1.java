@@ -4,6 +4,12 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Optional;
+
+import excel.exporter.config.CellInfo;
+import excel.exporter.config.FontInfo;
+import utils.Constants;
+import utils.ObjectUtils;
 
 public class Main1 {
 
@@ -20,7 +26,13 @@ public class Main1 {
 
 				if (method.getReturnType().isAnnotation()) {
 					Annotation nestedAnnotation = (Annotation) value;
-					nameField.set(obj, convertAnnotationToConcreteObject(obj, nestedAnnotation));
+
+					Optional<Object> instance = ObjectUtils
+							.createInstanceFromPackage(Constants.EXCEL_EXPORT_POJO_PACKAGE_NAME, nameField.getType());
+
+					if (instance.isPresent())
+						nameField.set(obj, convertAnnotationToConcreteObject(instance.get(), nestedAnnotation));
+
 					continue;
 				}
 				nameField.set(obj, value);
@@ -35,6 +47,7 @@ public class Main1 {
 	}
 
 	public static void main(String[] args) {
+
 		Test test = new Test();
 		test.example = "1000";
 
@@ -53,6 +66,10 @@ public class Main1 {
 		}
 
 		System.out.println(example1.toString());
+
+		CellInfo cell = new CellInfo();
+		cell.setBorder("1");
+		System.out.println(ObjectUtils.isEmpty(cell));
 
 	}
 }

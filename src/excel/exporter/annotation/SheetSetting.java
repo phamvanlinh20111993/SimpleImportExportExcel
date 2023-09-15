@@ -8,12 +8,15 @@ import java.lang.annotation.Target;
 @Retention(value = RetentionPolicy.RUNTIME)
 @Target(value = { ElementType.TYPE })
 public @interface SheetSetting {
-	
+
 	String name() default "";
-	
+
 	boolean isFitToPage() default true;
-	
+
 	boolean isDisplayGrid() default true;
-	
+
 	Font font() default @Font;
+
+	// TODO
+	String moreConfig() default "";
 }

@@ -24,6 +24,7 @@ import org.apache.poi.ss.usermodel.RichTextString;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +36,7 @@ import excel.exporter.config.SheetInfo;
 import excel.exporter.config.SheetInfoSetting;
 import excel.exporter.enums.ExcelType;
 import excel.exporter.enums.HeaderNameFormatType;
+import utils.ObjectUtils;
 
 public abstract class AbstractTableExcelExporter implements TableExcelExporter {
 
@@ -48,8 +50,6 @@ public abstract class AbstractTableExcelExporter implements TableExcelExporter {
 
 	private Integer initialRowIndex = 0;
 
-	protected List<SheetInfoSetting> sheetInfoSettings;
-
 	public AbstractTableExcelExporter(String fileName) {
 		this.fileName = fileName;
 		this.workbook = createWorkBook();
@@ -61,6 +61,11 @@ public abstract class AbstractTableExcelExporter implements TableExcelExporter {
 		this.workbook = createWorkBook();
 	}
 
+	/**
+	 * 
+	 * @param sheet
+	 * @param headerInfos
+	 */
 	protected void createHeader(Sheet sheet, List<HeaderInfo> headerInfos) {
 		Row rowHead = sheet.createRow(initialRowIndex);
 		int cellIndex = 0;
@@ -68,33 +73,50 @@ public abstract class AbstractTableExcelExporter implements TableExcelExporter {
 		for (HeaderInfo headerInfo : headerInfos) {
 			Cell cell = rowHead.createCell(cellIndex);
 			HeaderNameFormatType headerNameFormatType = headerInfo.getName().getType();
-			cell.setCellValue(headerNameFormatType.changeFormatType(headerInfo.getName().getValue()));
-			cell.setCellStyle(setCellStyle(headerInfo.getCellInfo()));
+			String headerName = headerNameFormatType.changeFormatType(headerInfo.getName().getValue());
+			cell.setCellValue(headerName);
+
+			if (ObjectUtils.isEmpty(headerInfo.getCellInfo())) {
+				cell.setCellStyle(this.defaultHeaderSetting());
+			} else {
+				cell.setCellStyle(setCellStyle(headerInfo.getCellInfo()));
+			}
+
 			if (headerInfo.isAutoWidth()) {
 				sheet.autoSizeColumn(cellIndex);
 			} else {
 				sheet.setColumnWidth(cellIndex, headerInfo.getWidth());
 			}
-			rowHead.setHeight(headerInfo.getRow().getHeight());
+			if (headerInfo.getRow() != null) {
+				rowHead.setHeight(headerInfo.getRow().getHeight());
+			}
 			cellIndex++;
 		}
 	}
 
+	/**
+	 * 
+	 * @param cellInfo
+	 * @return
+	 */
 	protected CellStyle setCellStyle(CellInfo cellInfo) {
-		CellStyle cellStyle = this.getWorkbook().createCellStyle();
+		CellStyle cellStyle = this.workbook.createCellStyle();
 
 		Font font = this.getWorkbook().createFont();
-		font.setBold(cellInfo.getFontSetting().isBold());
-		font.setColor(cellInfo.getFontSetting().getColor());
-		font.setFontName(cellInfo.getFontSetting().getName());
-		font.setFontHeightInPoints(cellInfo.getFontSetting().getSize());
+
+		if (!ObjectUtils.isEmpty(cellInfo.getFont())) {
+			font.setBold(cellInfo.getFont().isBold());
+			font.setColor(cellInfo.getFont().getColor());
+			font.setFontName(cellInfo.getFont().getName());
+			font.setFontHeightInPoints(cellInfo.getFont().getSize());
+		} else {
+			font = this.defaultFont();
+		}
 
 		cellStyle.setFont(font);
 		cellStyle.setAlignment(cellInfo.getHorizontalAlignment());
 		cellStyle.setVerticalAlignment(cellInfo.getVerticalAlignment());
-		
-		cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-		
+
 		cellStyle.setBorderLeft(BorderStyle.THIN);
 		cellStyle.setLeftBorderColor(IndexedColors.BLACK.index);
 		cellStyle.setBorderTop(BorderStyle.THIN);
@@ -103,18 +125,29 @@ public abstract class AbstractTableExcelExporter implements TableExcelExporter {
 		cellStyle.setBottomBorderColor(IndexedColors.BLACK.index);
 		cellStyle.setBorderRight(BorderStyle.THIN);
 		cellStyle.setRightBorderColor(IndexedColors.BLACK.index);
+		cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
-		if (cellInfo.getBackgroundColor() > 0) {
-			cellStyle.setFillBackgroundColor(cellInfo.getBackgroundColor());
-			cellStyle.setFillForegroundColor(cellInfo.getBackgroundColor());
+		if (!cellInfo.isBackgroundRGBColorEmpty()) {
+			XSSFCellStyle xssfCellStyle = (XSSFCellStyle) cellStyle;
+			xssfCellStyle.setFillForegroundColor(cellInfo.getBackgroundRGBColor());
+			xssfCellStyle.setFillBackgroundColor(cellInfo.getBackgroundRGBColor());
+			return xssfCellStyle;
 		} else {
-			cellStyle.setFillBackgroundColor(cellInfo.getBackgroundRGBColor().getIndex());
-			cellStyle.setFillForegroundColor(cellInfo.getBackgroundRGBColor().getIndex());
+			cellStyle.setFillForegroundColor(cellInfo.getBackgroundColor());
+			cellStyle.setFillBackgroundColor(cellInfo.getBackgroundColor());
 		}
 
 		return cellStyle;
 	}
 
+	/**
+	 * 
+	 * @param sheet
+	 * @param columnInfos
+	 * @param data
+	 * @throws IllegalArgumentException
+	 * @throws IllegalAccessException
+	 */
 	protected void createBody(Sheet sheet, List<ColumnInfo> columnInfos, List<Object> data)
 			throws IllegalArgumentException, IllegalAccessException {
 
@@ -128,10 +161,16 @@ public abstract class AbstractTableExcelExporter implements TableExcelExporter {
 			int cellInd = 0;
 
 			for (ColumnInfo columnInfo : columnInfos) {
-				row.setHeight(columnInfo.getRow().getHeight());
+				if (columnInfo.getRow() != null) {
+					row.setHeight(columnInfo.getRow().getHeight());
+				}
 				Cell cell = row.createCell(cellInd);
-				cell.setCellStyle(setCellStyle(columnInfo.getCellInfo()));
-				setCellValue(cell, listValues.get(cellInd++));
+				if (ObjectUtils.isEmpty(columnInfo.getCellInfo())) {
+					cell.setCellStyle(this.defaultColumnSetting());
+				} else {
+					cell.setCellStyle(setCellStyle(columnInfo.getCellInfo()));
+				}
+				setCellValue(cell, listValues.get(cellInd));
 				if (columnInfo.isAutoWidth()) {
 					sheet.autoSizeColumn(cellInd);
 				} else {
@@ -143,6 +182,8 @@ public abstract class AbstractTableExcelExporter implements TableExcelExporter {
 	}
 
 	public Workbook executeExport() {
+
+		List<SheetInfoSetting> sheetInfoSettings = this.getSheetsSetting();
 
 		List<List<Object>> data = this.getData();
 
@@ -158,6 +199,7 @@ public abstract class AbstractTableExcelExporter implements TableExcelExporter {
 
 			Sheet sheet = this.workbook.createSheet(sheetInfo.getName());
 			sheet.setDisplayGridlines(sheetInfo.isDisplayGrid());
+			sheet.setFitToPage(sheetInfo.isFitToPage());
 
 			try {
 				List<Object> listRows = data.get(ind);
@@ -169,8 +211,9 @@ public abstract class AbstractTableExcelExporter implements TableExcelExporter {
 				createBody(sheet, sheetInfoSetting.getColumnInfos(), listRows);
 
 			} catch (IllegalArgumentException | IllegalAccessException e) {
-				System.err.println(AbstractTableExcelExporter.class.getName() + "  export() error: " + e.getMessage());
-				logger.error(AbstractTableExcelExporter.class.getName() + "  export() error: {}", e.getMessage());
+				System.err.println(
+						AbstractTableExcelExporter.class.getName() + " executeExport() error: " + e.getMessage());
+				logger.error(AbstractTableExcelExporter.class.getName() + " executeExport() error: {}", e.getMessage());
 			}
 			ind++;
 		}
@@ -180,6 +223,10 @@ public abstract class AbstractTableExcelExporter implements TableExcelExporter {
 		return this.workbook;
 	}
 
+	/**
+	 * 
+	 * @param sheetsRemove
+	 */
 	protected void removeSheets(List<Integer> sheetsRemove) {
 		if (CollectionUtils.isEmpty(sheetsRemove))
 			return;
@@ -188,6 +235,10 @@ public abstract class AbstractTableExcelExporter implements TableExcelExporter {
 		}
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	protected Workbook createWorkBook() {
 		return excelType.equals(ExcelType.XLSX) ? new XSSFWorkbook() : new HSSFWorkbook();
 	}
@@ -202,10 +253,20 @@ public abstract class AbstractTableExcelExporter implements TableExcelExporter {
 		workbook.write(fileOut);
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public Workbook getWorkbook() {
 		return this.workbook;
 	}
 
+	/**
+	 * 
+	 * @param commentStr
+	 * @param author
+	 * @return
+	 */
 	public Comment addCellComment(String commentStr, String author) {
 
 		Sheet sheet = this.workbook.createSheet();
@@ -228,4 +289,16 @@ public abstract class AbstractTableExcelExporter implements TableExcelExporter {
 
 		return comment;
 	}
+
+	protected Font defaultFont() {
+		Font font = this.getWorkbook().createFont();
+		font.setFontName("Arial");
+		font.setFontHeightInPoints((short) 10);
+		font.setItalic(false);
+		font.setColor(IndexedColors.BLACK.getIndex());
+
+		return font;
+	}
+
+	abstract List<SheetInfoSetting> getSheetsSetting();
 }

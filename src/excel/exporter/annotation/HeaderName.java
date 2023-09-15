@@ -10,8 +10,8 @@ import excel.exporter.enums.HeaderNameFormatType;
 @Retention(value = RetentionPolicy.RUNTIME)
 @Target(value = { ElementType.FIELD })
 public @interface HeaderName {
-	
+
 	public String value() default "";
-	
+
 	public HeaderNameFormatType type() default HeaderNameFormatType.NORMAL;
 }

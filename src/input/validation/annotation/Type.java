@@ -11,6 +11,6 @@ import input.validation.utils.ValidateType;
 @Target(value = { ElementType.FIELD })
 public @interface Type {
 	public String pattern() default "";
-	
+
 	public ValidateType type() default ValidateType.STRING;
 }

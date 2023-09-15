@@ -6,8 +6,8 @@ import lombok.Data;
 
 @Data
 public class CellBorder {
-	
+
 	private short boderColor;
-	
+
 	private BorderStyle borderStyle;
 }

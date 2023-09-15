@@ -1,5 +1,9 @@
 package excel.exporter.config;
 
+import java.awt.Color;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
@@ -10,10 +14,10 @@ import lombok.Data;
 
 @Data
 public class CellInfo {
-	
+
 	private FillPatternType fillPatternType;
-	
-	private FontInfo fontSetting;
+
+	private FontInfo font;
 
 	private VerticalAlignment verticalAlignment;
 
@@ -24,18 +28,21 @@ public class CellInfo {
 	private String backgroundRGBColor;
 
 	private String border;
-	
+
+	// TODO
+	private String moreConfig;
+
 	public XSSFColor getBackgroundRGBColor() {
 		String[] rgbStr = backgroundRGBColor.split(";");
 
-		byte[] rgb = new byte[3];
+		short[] rgb = new short[3];
 		if (rgbStr.length == 3) {
-			rgb[0] = Byte.parseByte(rgbStr[0]);
-			rgb[1] = Byte.parseByte(rgbStr[1]);
-			rgb[2] = Byte.parseByte(rgbStr[2]);
+			rgb[0] = Short.parseShort(rgbStr[0]);
+			rgb[1] = Short.parseShort(rgbStr[1]);
+			rgb[2] = Short.parseShort(rgbStr[2]);
 		}
 
-		return new XSSFColor(rgb);
+		return new XSSFColor(new Color(rgb[0], rgb[1], rgb[2]), null);
 	}
 
 	public short[] getBorder() {
@@ -49,5 +56,14 @@ public class CellInfo {
 		}
 
 		return borders;
+	}
+
+	public boolean isBackgroundRGBColorEmpty() {
+		return StringUtils.isAllEmpty(this.backgroundRGBColor);
+	}
+
+	@Override
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this);
 	}
 }

@@ -1,16 +1,9 @@
 package excel.importer.utils;
 
 public enum CellType {
-	STRING("String"), 
-	DOUBLE("Double"), 
-	LONG("Long"), 
-	DATE("Date"),
-	DECIMAL("Decimal"),
-	ARRAY("Array"),
-	JSON("Json"),
-	LOCALDATETIME("LocalDateTime"),
-	BOOLEAN("Bool");
-	
+	STRING("String"), DOUBLE("Double"), LONG("Long"), DATE("Date"), DECIMAL("Decimal"), ARRAY("Array"), JSON(
+			"Json"), LOCALDATETIME("LocalDateTime"), BOOLEAN("Bool");
+
 	private String typeValue;
 
 	private CellType(String typeValue) {
