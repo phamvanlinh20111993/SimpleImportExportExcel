@@ -1,7 +1,9 @@
-package excel.importer.utils;
+package utils;
 
 public enum ExcelType {
-	XSSF("Horrible Spreadsheet Format"), HSSF("XML Spreadsheet Format");
+	XSSF("Horrible Spreadsheet Format"), 
+	HSSF("XML Spreadsheet Format"),
+	SSXSSF("Streaming Horrible Spreadsheet Format");
 
 	private String typeValue;
 

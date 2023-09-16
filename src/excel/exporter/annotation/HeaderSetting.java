@@ -17,9 +17,9 @@ public @interface HeaderSetting {
 
 	RowSetting row() default @RowSetting(type = RowType.HEADER);
 
-	short width() default (short) 250;
+	short width() default (short) 25 * 256;
 
-	CellSetting cellInfo() default @CellSetting(horizontalAlignment = HorizontalAlignment.CENTER);
+	CellSetting cellInfo() default @CellSetting(horizontalAlignment = HorizontalAlignment.CENTER, backgroundRGBColor = "128;128;128");
 
 	HeaderName name() default @HeaderName;
 

@@ -1,6 +1,12 @@
 package excel.exporter.config;
 
+import java.awt.Color;
+
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.poi.hssf.usermodel.HSSFPalette;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.xssf.usermodel.DefaultIndexedColorMap;
 import org.apache.poi.xssf.usermodel.XSSFColor;
 
 import lombok.Data;
@@ -12,23 +18,43 @@ public class FontInfo {
 
 	private String rgbColor;
 
-	private short color;
+	private Short color;
 
-	private short size;
+	private Short size;
 
-	private boolean isUnderline;
+	private Boolean isUnderline;
 
-	private boolean isBold;
+	private Boolean isBold;
 
-	public XSSFColor getRgbColor() {
+	public XSSFColor getXSSFRgbColor() {
 		String[] rgbStr = rgbColor.split(";");
-		byte[] rgb = new byte[3];
+		short[] rgb = new short[3];
 		if (rgbStr.length == 3) {
-			rgb[0] = Byte.parseByte(rgbStr[0]);
-			rgb[1] = Byte.parseByte(rgbStr[1]);
-			rgb[2] = Byte.parseByte(rgbStr[2]);
+			rgb[0] = Short.parseShort(rgbStr[0]);
+			rgb[1] = Short.parseShort(rgbStr[1]);
+			rgb[2] = Short.parseShort(rgbStr[2]);
 		}
-		return new XSSFColor(rgb);
+		return new XSSFColor(new Color(rgb[0], rgb[1], rgb[2]), new DefaultIndexedColorMap());
+	}
+
+	public HSSFColor getHSSFRgbColor(HSSFWorkbook workbook) {
+		String[] rgbStr = rgbColor.split(";");
+		short[] rgb = new short[3];
+		if (rgbStr.length == 3) {
+			rgb[0] = Short.parseShort(rgbStr[0]);
+			rgb[1] = Short.parseShort(rgbStr[1]);
+			rgb[2] = Short.parseShort(rgbStr[2]);
+		}
+
+		HSSFWorkbook hssfworkbook = (HSSFWorkbook) workbook;
+		HSSFPalette palette = hssfworkbook.getCustomPalette();
+
+		HSSFColor hssfColor = palette.findSimilarColor(rgb[0], rgb[1], rgb[2]);
+		if (hssfColor == null) {
+			hssfColor = palette.findSimilarColor(rgb[0], rgb[1], rgb[2]);
+		}
+
+		return hssfColor;
 	}
 
 	@Override

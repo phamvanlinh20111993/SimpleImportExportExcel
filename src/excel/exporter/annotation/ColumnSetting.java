@@ -15,9 +15,9 @@ public @interface ColumnSetting {
 
 	RowSetting row() default @RowSetting(type = RowType.BODY);
 
-	short width() default (short) 250;
+	short width() default (short) 25 * 256;
 
-	CellSetting cellInfo() default @CellSetting;
+	CellSetting cellInfo() default @CellSetting(backgroundRGBColor = "255;255;255");
 
 	// TODO
 	String moreConfig() default "";

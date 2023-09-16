@@ -3,7 +3,10 @@ package excel.exporter.enums;
 import org.apache.commons.lang3.StringUtils;
 
 public enum HeaderNameFormatType {
-	DEFAULT("default"), NORMAL("normal"), UPPER("upper"), LOWER("lower");
+	DEFAULT("default"), 
+	NORMAL("normal"), 
+	UPPER("upper"), 
+	LOWER("lower");
 
 	private String typeValue;
 

@@ -10,16 +10,20 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class HeaderInfo {
+	// TODO will using later
+	private Integer rowSpan = 1;
+	// TODO will using later
+	private Integer colSpan = 1;
 
 	private RowInfo row;
 
-	private short width;
+	private Short width = (short) 25 * 256;
 
 	private CellInfo cellInfo;
 
 	private HeaderName name;
 
-	private boolean isAutoWidth;
+	private Boolean isAutoWidth = false;
 
 	// TODO
 	private String moreConfig;

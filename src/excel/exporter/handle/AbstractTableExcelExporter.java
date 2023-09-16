@@ -10,25 +10,21 @@ import java.util.Map;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.ClientAnchor;
-import org.apache.poi.ss.usermodel.Comment;
-import org.apache.poi.ss.usermodel.CreationHelper;
-import org.apache.poi.ss.usermodel.Drawing;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.IndexedColors;
-import org.apache.poi.ss.usermodel.RichTextString;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import excel.exporter.config.CellBorder;
 import excel.exporter.config.CellInfo;
 import excel.exporter.config.ColumnInfo;
 import excel.exporter.config.HeaderInfo;
@@ -67,6 +63,9 @@ public abstract class AbstractTableExcelExporter implements TableExcelExporter {
 	 * @param headerInfos
 	 */
 	protected void createHeader(Sheet sheet, List<HeaderInfo> headerInfos) {
+
+		logger.info(AbstractTableExcelExporter.class.getName() + " createHeader() start");
+
 		Row rowHead = sheet.createRow(initialRowIndex);
 		int cellIndex = 0;
 
@@ -82,16 +81,19 @@ public abstract class AbstractTableExcelExporter implements TableExcelExporter {
 				cell.setCellStyle(setCellStyle(headerInfo.getCellInfo()));
 			}
 
-			if (headerInfo.isAutoWidth()) {
+			if (headerInfo.getIsAutoWidth()) {
 				sheet.autoSizeColumn(cellIndex);
 			} else {
 				sheet.setColumnWidth(cellIndex, headerInfo.getWidth());
 			}
+			
 			if (headerInfo.getRow() != null) {
 				rowHead.setHeight(headerInfo.getRow().getHeight());
 			}
 			cellIndex++;
 		}
+
+		logger.info(AbstractTableExcelExporter.class.getName() + " createHeader() end");
 	}
 
 	/**
@@ -105,7 +107,7 @@ public abstract class AbstractTableExcelExporter implements TableExcelExporter {
 		Font font = this.getWorkbook().createFont();
 
 		if (!ObjectUtils.isEmpty(cellInfo.getFont())) {
-			font.setBold(cellInfo.getFont().isBold());
+			font.setBold(cellInfo.getFont().getIsBold());
 			font.setColor(cellInfo.getFont().getColor());
 			font.setFontName(cellInfo.getFont().getName());
 			font.setFontHeightInPoints(cellInfo.getFont().getSize());
@@ -117,14 +119,19 @@ public abstract class AbstractTableExcelExporter implements TableExcelExporter {
 		cellStyle.setAlignment(cellInfo.getHorizontalAlignment());
 		cellStyle.setVerticalAlignment(cellInfo.getVerticalAlignment());
 
-		cellStyle.setBorderLeft(BorderStyle.THIN);
-		cellStyle.setLeftBorderColor(IndexedColors.BLACK.index);
-		cellStyle.setBorderTop(BorderStyle.THIN);
-		cellStyle.setTopBorderColor(IndexedColors.BLACK.index);
-		cellStyle.setBorderBottom(BorderStyle.THIN);
-		cellStyle.setBottomBorderColor(IndexedColors.BLACK.index);
-		cellStyle.setBorderRight(BorderStyle.THIN);
-		cellStyle.setRightBorderColor(IndexedColors.BLACK.index);
+		CellBorder[] cellBorders = cellInfo.getBorders();
+		cellStyle.setBorderTop(cellBorders[0].getBorderStyle());
+		cellStyle.setTopBorderColor(cellBorders[0].getBorderColor());
+
+		cellStyle.setBorderLeft(cellBorders[1].getBorderStyle());
+		cellStyle.setLeftBorderColor(cellBorders[1].getBorderColor());
+
+		cellStyle.setBorderBottom(cellBorders[2].getBorderStyle());
+		cellStyle.setBottomBorderColor(cellBorders[2].getBorderColor());
+
+		cellStyle.setBorderRight(cellBorders[3].getBorderStyle());
+		cellStyle.setRightBorderColor(cellBorders[3].getBorderColor());
+
 		cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
 		if (!cellInfo.isBackgroundRGBColorEmpty()) {
@@ -148,9 +155,9 @@ public abstract class AbstractTableExcelExporter implements TableExcelExporter {
 	 * @throws IllegalArgumentException
 	 * @throws IllegalAccessException
 	 */
-	protected void createBody(Sheet sheet, List<ColumnInfo> columnInfos, List<Object> data)
+	protected void createBody(Sheet sheet, List<ColumnInfo> columnInfos, List<?> data)
 			throws IllegalArgumentException, IllegalAccessException {
-
+		logger.info(AbstractTableExcelExporter.class.getName() + " createBody() start");
 		int rowIndex = ++initialRowIndex;
 
 		for (Object rowData : data) {
@@ -171,7 +178,7 @@ public abstract class AbstractTableExcelExporter implements TableExcelExporter {
 					cell.setCellStyle(setCellStyle(columnInfo.getCellInfo()));
 				}
 				setCellValue(cell, listValues.get(cellInd));
-				if (columnInfo.isAutoWidth()) {
+				if (columnInfo.getIsAutoWidth()) {
 					sheet.autoSizeColumn(cellInd);
 				} else {
 					sheet.setColumnWidth(cellInd, columnInfo.getWidth());
@@ -179,30 +186,29 @@ public abstract class AbstractTableExcelExporter implements TableExcelExporter {
 				cellInd++;
 			}
 		}
+
+		logger.info(AbstractTableExcelExporter.class.getName() + " createBody() end");
 	}
 
 	public Workbook executeExport() {
-
+		logger.info(AbstractTableExcelExporter.class.getName() + " executeExport() start");
 		List<SheetInfoSetting> sheetInfoSettings = this.getSheetsSetting();
 
-		List<List<Object>> data = this.getData();
-
-		this.initialRowIndex = 0;
-
+		List<List<?>> data = this.getData();
 		int ind = 0;
-
 		List<Integer> sheetsRemove = new ArrayList<>();
 
 		for (SheetInfoSetting sheetInfoSetting : sheetInfoSettings) {
+			this.initialRowIndex = 0;
 
 			SheetInfo sheetInfo = sheetInfoSetting.getSheetInfo();
 
 			Sheet sheet = this.workbook.createSheet(sheetInfo.getName());
-			sheet.setDisplayGridlines(sheetInfo.isDisplayGrid());
-			sheet.setFitToPage(sheetInfo.isFitToPage());
+			sheet.setDisplayGridlines(sheetInfo.getIsDisplayGrid());
+			sheet.setFitToPage(sheetInfo.getIsFitToPage());
 
 			try {
-				List<Object> listRows = data.get(ind);
+				List<?> listRows = data.get(ind);
 				if (listRows.isEmpty()) {
 					sheetsRemove.add(ind);
 					continue;
@@ -220,6 +226,7 @@ public abstract class AbstractTableExcelExporter implements TableExcelExporter {
 
 		removeSheets(sheetsRemove);
 
+		logger.info(AbstractTableExcelExporter.class.getName() + " executeExport() end");
 		return this.workbook;
 	}
 
@@ -240,7 +247,8 @@ public abstract class AbstractTableExcelExporter implements TableExcelExporter {
 	 * @return
 	 */
 	protected Workbook createWorkBook() {
-		return excelType.equals(ExcelType.XLSX) ? new XSSFWorkbook() : new HSSFWorkbook();
+		return excelType.equals(ExcelType.XLSX) ? new XSSFWorkbook()
+				: excelType.equals(ExcelType.SXSSF) ? new SXSSFWorkbook() : new HSSFWorkbook();
 	}
 
 	@Override
@@ -259,35 +267,6 @@ public abstract class AbstractTableExcelExporter implements TableExcelExporter {
 	 */
 	public Workbook getWorkbook() {
 		return this.workbook;
-	}
-
-	/**
-	 * 
-	 * @param commentStr
-	 * @param author
-	 * @return
-	 */
-	public Comment addCellComment(String commentStr, String author) {
-
-		Sheet sheet = this.workbook.createSheet();
-		Drawing<?> drawing = sheet.createDrawingPatriarch();
-		CreationHelper factory = this.workbook.getCreationHelper();
-		ClientAnchor anchor = factory.createClientAnchor();
-
-		Comment comment = drawing.createCellComment(anchor);
-		RichTextString richTextStr = factory.createRichTextString(commentStr);
-
-		Font font = this.workbook.createFont();
-		font.setFontName("Arial");
-		font.setFontHeightInPoints((short) 14);
-		font.setBold(true);
-		font.setColor(IndexedColors.RED.getIndex());
-		richTextStr.applyFont(font);
-
-		comment.setString(richTextStr);
-		comment.setAuthor(author);
-
-		return comment;
 	}
 
 	protected Font defaultFont() {

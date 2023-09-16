@@ -6,14 +6,18 @@ import lombok.Data;
 
 @Data
 public class ColumnInfo {
+	// TODO will using later
+	private Integer rowSpan = 1;
+	// TODO will using later
+	private Integer colSpan = 1;
 
 	private RowInfo row;
 
-	private short width;
+	private Short width = (short) 25 * 256;
 
 	private CellInfo cellInfo;
 
-	private boolean isAutoWidth;
+	private Boolean isAutoWidth = false;
 
 	// TODO
 	private String moreConfig;

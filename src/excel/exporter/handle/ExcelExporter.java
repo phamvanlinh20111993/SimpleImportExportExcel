@@ -17,7 +17,7 @@ public interface ExcelExporter {
 	 * 
 	 * @return
 	 */
-	public List<List<Object>> getData();
+	public List<List<?>> getData();
 
 	/**
 	 * 

@@ -135,14 +135,14 @@ public interface TableExcelExporter extends ExcelExporter {
 				headerInfos.set(index, headerInfoDefault);
 			}
 		}
-
+		// defined annotation at class level
 		if (obj.getClass().isAnnotationPresent(ColumnSetting.class)) {
 			columnInfoDefault = toColumnInfo(obj.getClass().getAnnotation(ColumnSetting.class));
 			for (int index = 0; index < fields.length; index++) {
 				columnInfos.set(index, columnInfoDefault);
 			}
 		}
-
+		// defined annotation at class level
 		if (obj.getClass().isAnnotationPresent(Font.class)) {
 			fontInfoDefault = toFontInfo(obj.getClass().getAnnotation(Font.class));
 			for (int index = 0; index < fields.length; index++) {
@@ -170,7 +170,7 @@ public interface TableExcelExporter extends ExcelExporter {
 			}
 
 			/**
-			 * detect if header value is empty
+			 * detect if header name value is empty
 			 */
 			if (headerInfos.get(index).getName() == null
 					|| StringUtils.isAllEmpty(headerInfos.get(index).getName().getValue())) {
@@ -178,7 +178,7 @@ public interface TableExcelExporter extends ExcelExporter {
 				excel.exporter.config.HeaderName headerName = new excel.exporter.config.HeaderName();
 				if (field.isAnnotationPresent(HeaderName.class)) {
 					headerName = toHeaderName(field.getAnnotation(HeaderName.class));
-					// we dont have any setting, auto get header name is class property
+					// we don't have any setting, auto get header name is the class property
 				} else {
 					headerName.setValue(name);
 				}

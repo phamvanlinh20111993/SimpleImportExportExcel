@@ -10,7 +10,13 @@ import excel.exporter.annotation.Font;
 import excel.exporter.annotation.HeaderName;
 import excel.exporter.annotation.HeaderSetting;
 import excel.exporter.annotation.SheetSetting;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 @SheetSetting(isDisplayGrid = false, name = "example")
 public class Employee {
 
@@ -19,7 +25,7 @@ public class Employee {
 	private Long id;
 
 	@HeaderName("employee name")
-	@HeaderSetting(cellInfo = @CellSetting(font = @Font(rgbColor = "255;0;0", isBold = true, size = 11), backgroundRGBColor = "128;128;128"), isAutoWidth = true)
+	@HeaderSetting(cellInfo = @CellSetting(font = @Font(rgbColor = "255;0;0", isBold = true, size = 11), backgroundRGBColor = "128;128;128", border = "6-2:6-2:6-2:6-2"), isAutoWidth = true)
 	@ColumnSetting(isAutoWidth = true)
 	private String name;
 
@@ -40,66 +46,4 @@ public class Employee {
 	@HeaderSetting(cellInfo = @CellSetting(font = @Font(rgbColor = "255;0;0", isBold = true, size = 11), backgroundRGBColor = "128;128;128"), isAutoWidth = true)
 	@ColumnSetting(isAutoWidth = true)
 	private String date;
-
-	public Employee() {
-
-	}
-
-	public Employee(Long id, String name, short age, boolean istall, Date currentTime) {
-		super();
-		this.id = id;
-		this.name = name;
-		this.age = age;
-		this.istall = istall;
-		this.currentTime = currentTime;
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public short getAge() {
-		return age;
-	}
-
-	public void setAge(short age) {
-		this.age = age;
-	}
-
-	public boolean isIstall() {
-		return istall;
-	}
-
-	public void setIstall(boolean istall) {
-		this.istall = istall;
-	}
-
-	public Date getCurrentTime() {
-		return currentTime;
-	}
-
-	public void setCurrentTime(Date currentTime) {
-		this.currentTime = currentTime;
-	}
-
-	public String getDate() {
-		return date;
-	}
-
-	public void setDate(String date) {
-		this.date = date;
-	}
-
 }

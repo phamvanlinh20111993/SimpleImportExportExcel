@@ -1,7 +1,7 @@
 package excel.exporter.enums;
 
 public enum ExcelType {
-	XLSX("xlsx"), XLS("xls");
+	XLSX("xlsx"), XLS("xls"), SXSSF("xlsx");
 
 	private String typeValue;
 

@@ -7,7 +7,7 @@ import lombok.Data;
 
 @Data
 public class RowInfo {
-	private short height;
+	private short height = (short) 400;
 
 	private RowType type;
 

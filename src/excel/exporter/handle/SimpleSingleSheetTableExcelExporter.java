@@ -5,34 +5,39 @@ import java.util.List;
 
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.ClientAnchor;
+import org.apache.poi.ss.usermodel.Comment;
+import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.usermodel.Drawing;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.usermodel.RichTextString;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
 
 import excel.exporter.config.SheetInfoSetting;
 import excel.exporter.enums.ExcelType;
 
-public class SimpleTableExcelExporter<T extends Object> extends AbstractTableExcelExporter {
+public class SimpleSingleSheetTableExcelExporter<T extends Object> extends AbstractTableExcelExporter {
 
 	private List<T> listData;
 
-	public SimpleTableExcelExporter(String fileName, List<T> listData) {
+	public SimpleSingleSheetTableExcelExporter(String fileName, List<T> listData) {
 		super(fileName);
 		this.listData = listData;
 	}
 
-	public SimpleTableExcelExporter(String fileName, List<T> listData, ExcelType excelType) {
+	public SimpleSingleSheetTableExcelExporter(String fileName, List<T> listData, ExcelType excelType) {
 		super(fileName, excelType);
 		this.listData = listData;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public List<List<Object>> getData() {
-		List<List<Object>> data = new LinkedList<List<Object>>();
-		data.add((List<Object>) listData);
+	public List<List<?>> getData() {
+		List<List<?>> data = new LinkedList<List<?>>();
+		data.add(listData);
 		return data;
 	}
 
@@ -92,5 +97,34 @@ public class SimpleTableExcelExporter<T extends Object> extends AbstractTableExc
 			infoSettings.add(toSheetInfo(listData.get(0)));
 		}
 		return infoSettings;
+	}
+	
+	/**
+	 * 
+	 * @param commentStr
+	 * @param author
+	 * @return
+	 */
+	public Comment addCellComment(String commentStr, String author) {
+
+		Sheet sheet = getWorkbook().createSheet();
+		Drawing<?> drawing = sheet.createDrawingPatriarch();
+		CreationHelper factory = getWorkbook().getCreationHelper();
+		ClientAnchor anchor = factory.createClientAnchor();
+
+		Comment comment = drawing.createCellComment(anchor);
+		RichTextString richTextStr = factory.createRichTextString(commentStr);
+
+		Font font = getWorkbook().createFont();
+		font.setFontName("Arial");
+		font.setFontHeightInPoints((short) 14);
+		font.setBold(true);
+		font.setColor(IndexedColors.RED.getIndex());
+		richTextStr.applyFont(font);
+
+		comment.setString(richTextStr);
+		comment.setAuthor(author);
+
+		return comment;
 	}
 }

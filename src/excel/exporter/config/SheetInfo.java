@@ -7,11 +7,11 @@ import lombok.Data;
 @Data
 public class SheetInfo {
 
-	private boolean isFitToPage;
+	private Boolean isFitToPage;
 
 	private String name;
 
-	private boolean isDisplayGrid;
+	private Boolean isDisplayGrid;
 
 	private FontInfo font;
 
