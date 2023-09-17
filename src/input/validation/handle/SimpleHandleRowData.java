@@ -9,6 +9,10 @@ import input.validation.validate.ValidationHandler;
 public class SimpleHandleRowData<R> extends SimpleAbstractHandleRowData<R> {
 
 	protected List<ErrorDetail> errors;
+	
+	public SimpleHandleRowData() {
+		super();
+	}
 
 	public SimpleHandleRowData(R rowData) {
 		super(rowData);
@@ -28,7 +32,7 @@ public class SimpleHandleRowData<R> extends SimpleAbstractHandleRowData<R> {
 	}
 
 	public boolean isRowDataError() {
-		return this.errors.size() == 0;
+		return this.errors.size() > 0;
 	}
 
 }

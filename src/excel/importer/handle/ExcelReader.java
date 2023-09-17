@@ -1,13 +1,16 @@
 package excel.importer.handle;
 
-import java.util.Map;
+import java.util.List;
 
+/**
+ * 
+ * @author PhamLinh
+ *
+ */
 public interface ExcelReader {
-
-	public void config();
-
-	public Map<String, Object> execute();
-
-	public void finish();
-
+	/**
+	 * 
+	 * @return
+	 */
+	List<List<Object>> executeImport();
 }

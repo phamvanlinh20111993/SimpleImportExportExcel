@@ -2,118 +2,54 @@ package main;
 
 import java.math.BigDecimal;
 
-import excel.importer.annotation.MappingHeader;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
+import excel.importer.annotation.MappingField;
 import excel.importer.utils.CellType;
 import input.validation.annotation.Max;
 import input.validation.annotation.NotEmpty;
 import input.validation.annotation.NotNull;
 import input.validation.annotation.Size;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class PriceTableKiotVietDataModel {
 
-	@Size(size = 10)
+	@Size(size = 8)
 	@NotNull
-	@MappingHeader(value = "Mã hàng", type = CellType.STRING)
+	@MappingField(value = "Mã hàng", type = CellType.STRING)
 	private String goodCode;
 
-	@Max(value = 100)
+	@Max(value = 30)
 	@NotNull
-	@MappingHeader(value = "Tên hàng", type = CellType.STRING)
+	@MappingField(value = "Tên hàng", type = CellType.STRING)
 	private String goodName;
 
-	@NotEmpty
-	@MappingHeader(value = "Đơn vị tính", type = CellType.STRING)
+	// @NotEmpty
+	@MappingField(value = "Đơn vị tính", type = CellType.STRING)
 	private String unit;
 
-	@MappingHeader(value = "Nhóm hàng", type = CellType.STRING)
+	@MappingField(value = "Nhóm hàng", type = CellType.STRING)
 	private String goodGroup;
 
-	@MappingHeader(value = "Tồn kho", type = CellType.DOUBLE)
+	@MappingField(value = "Tồn kho", type = CellType.DOUBLE)
 	private Double inventoryNumber;
 
-	@MappingHeader(value = "Giá vốn", type = CellType.DOUBLE)
+	@MappingField(value = "Giá vốn", type = CellType.DECIMAL)
 	private BigDecimal costPrice;
 
-	@MappingHeader(value = "Giá nhập cuối", type = CellType.DOUBLE)
+	@MappingField(value = "Giá nhập cuối", type = CellType.DECIMAL)
 	private BigDecimal lastCostPrice;
 
-	@MappingHeader(value = "Giá chung", type = CellType.DOUBLE)
+	@MappingField(value = "Giá chung", type = CellType.DECIMAL)
 	private BigDecimal marketCostPrice;
-
-	public PriceTableKiotVietDataModel(String goodCode, String goodName, String unit, String goodGroup,
-			Double inventoryNumber, BigDecimal costPrice, BigDecimal lastCostPrice, BigDecimal marketCostPrice) {
-		super();
-		this.goodCode = goodCode;
-		this.goodName = goodName;
-		this.unit = unit;
-		this.goodGroup = goodGroup;
-		this.inventoryNumber = inventoryNumber;
-		this.costPrice = costPrice;
-		this.lastCostPrice = lastCostPrice;
-		this.marketCostPrice = marketCostPrice;
-	}
-
-	public String getGoodCode() {
-		return goodCode;
-	}
-
-	public void setGoodCode(String goodCode) {
-		this.goodCode = goodCode;
-	}
-
-	public String getGoodName() {
-		return goodName;
-	}
-
-	public void setGoodName(String goodName) {
-		this.goodName = goodName;
-	}
-
-	public String getUnit() {
-		return unit;
-	}
-
-	public void setUnit(String unit) {
-		this.unit = unit;
-	}
-
-	public String getGoodGroup() {
-		return goodGroup;
-	}
-
-	public void setGoodGroup(String goodGroup) {
-		this.goodGroup = goodGroup;
-	}
-
-	public Double getInventoryNumber() {
-		return inventoryNumber;
-	}
-
-	public void setInventoryNumber(Double inventoryNumber) {
-		this.inventoryNumber = inventoryNumber;
-	}
-
-	public BigDecimal getCostPrice() {
-		return costPrice;
-	}
-
-	public void setCostPrice(BigDecimal costPrice) {
-		this.costPrice = costPrice;
-	}
-
-	public BigDecimal getLastCostPrice() {
-		return lastCostPrice;
-	}
-
-	public void setLastCostPrice(BigDecimal lastCostPrice) {
-		this.lastCostPrice = lastCostPrice;
-	}
-
-	public BigDecimal getMarketCostPrice() {
-		return marketCostPrice;
-	}
-
-	public void setMarketCostPrice(BigDecimal marketCostPrice) {
-		this.marketCostPrice = marketCostPrice;
+	
+	@Override
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this);
 	}
 }

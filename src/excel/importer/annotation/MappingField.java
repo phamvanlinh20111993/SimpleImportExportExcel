@@ -9,7 +9,7 @@ import excel.importer.utils.CellType;
 
 @Retention(value = RetentionPolicy.RUNTIME)
 @Target(value = { ElementType.FIELD })
-public @interface MappingHeader {
+public @interface MappingField {
 
 	String value() default "";
 

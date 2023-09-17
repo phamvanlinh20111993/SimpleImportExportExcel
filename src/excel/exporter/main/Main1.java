@@ -6,7 +6,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Optional;
 
-import excel.exporter.config.CellInfo;
+import excel.exporter.datainfo.CellInfo;
 import utils.Constants;
 import utils.ObjectUtils;
 

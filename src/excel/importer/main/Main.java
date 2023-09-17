@@ -5,13 +5,12 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
-import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import excel.importer.SimpleTableExcelImporter;
-import excel.importer.TableExcelImporter;
+import excel.importer.handle.DefaultTableExcelReader;
+import excel.importer.handle.TableExcelReader;
+import main.PriceTableKiotVietDataModel;
 
 public class Main {
 
@@ -23,18 +22,16 @@ public class Main {
 			file = new FileInputStream(new File(path));
 			// Create Workbook instance holding reference to .xlsx file
 			XSSFWorkbook workbook = new XSSFWorkbook(file);
-			// Get first/desired sheet from the workbook
-			XSSFSheet sheet = workbook.getSheetAt(0);
 
-			SimpleTableExcelImporter excelImporter = new SimpleTableExcelImporter(sheet);
+			List<PriceTableKiotVietDataModel> models = List.of(new PriceTableKiotVietDataModel());
+			TableExcelReader excelImporter = new DefaultTableExcelReader(workbook, models);
 
-			List<Map<String, Object>> datas = excelImporter.read(true);
+			List<List<Object>> datas = excelImporter.executeImport();
 
-			for (Map<String, Object> row : datas) {
-				for (Map.Entry<String, Object> cellData : row.entrySet()) {
-					System.out.print(cellData + " ");
+			for (List<Object> tableRow : datas) {
+				for (Object row : tableRow) {
+					System.out.println("Data " + row.toString());
 				}
-				System.out.println();
 			}
 
 			workbook.close();

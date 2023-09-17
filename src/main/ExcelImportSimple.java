@@ -20,11 +20,8 @@ public abstract class ExcelImportSimple {
 
 	private String pathFile;
 
-	private String sheetName;
-
 	public ExcelImportSimple(String pathFile, String sheetName) {
 		this.pathFile = pathFile;
-		this.sheetName = sheetName;
 	}
 
 	protected void createWorkBook(String fileName) {

@@ -24,12 +24,12 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import excel.exporter.config.CellBorder;
-import excel.exporter.config.CellInfo;
-import excel.exporter.config.ColumnInfo;
-import excel.exporter.config.HeaderInfo;
-import excel.exporter.config.SheetInfo;
-import excel.exporter.config.SheetInfoSetting;
+import excel.exporter.datainfo.CellBorder;
+import excel.exporter.datainfo.CellInfo;
+import excel.exporter.datainfo.ColumnInfo;
+import excel.exporter.datainfo.HeaderInfo;
+import excel.exporter.datainfo.SheetInfo;
+import excel.exporter.datainfo.SheetInfoSetting;
 import excel.exporter.enums.ExcelType;
 import excel.exporter.enums.HeaderNameFormatType;
 import utils.ObjectUtils;

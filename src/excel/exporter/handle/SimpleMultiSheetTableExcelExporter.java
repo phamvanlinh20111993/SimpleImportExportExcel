@@ -11,7 +11,7 @@ import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
 
-import excel.exporter.config.SheetInfoSetting;
+import excel.exporter.datainfo.SheetInfoSetting;
 import excel.exporter.enums.ExcelType;
 
 public class SimpleMultiSheetTableExcelExporter extends AbstractTableExcelExporter {

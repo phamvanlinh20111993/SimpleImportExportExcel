@@ -20,13 +20,13 @@ import excel.exporter.annotation.HeaderName;
 import excel.exporter.annotation.HeaderSetting;
 import excel.exporter.annotation.RowSetting;
 import excel.exporter.annotation.SheetSetting;
-import excel.exporter.config.CellInfo;
-import excel.exporter.config.ColumnInfo;
-import excel.exporter.config.FontInfo;
-import excel.exporter.config.HeaderInfo;
-import excel.exporter.config.RowInfo;
-import excel.exporter.config.SheetInfo;
-import excel.exporter.config.SheetInfoSetting;
+import excel.exporter.datainfo.CellInfo;
+import excel.exporter.datainfo.ColumnInfo;
+import excel.exporter.datainfo.FontInfo;
+import excel.exporter.datainfo.HeaderInfo;
+import excel.exporter.datainfo.RowInfo;
+import excel.exporter.datainfo.SheetInfo;
+import excel.exporter.datainfo.SheetInfoSetting;
 import utils.Constants;
 import utils.ObjectUtils;
 
@@ -175,7 +175,7 @@ public interface TableExcelExporter extends ExcelExporter {
 			if (headerInfos.get(index).getName() == null
 					|| StringUtils.isAllEmpty(headerInfos.get(index).getName().getValue())) {
 				HeaderInfo headerInfo = headerInfos.get(index);
-				excel.exporter.config.HeaderName headerName = new excel.exporter.config.HeaderName();
+				excel.exporter.datainfo.HeaderName headerName = new excel.exporter.datainfo.HeaderName();
 				if (field.isAnnotationPresent(HeaderName.class)) {
 					headerName = toHeaderName(field.getAnnotation(HeaderName.class));
 					// we don't have any setting, auto get header name is the class property
@@ -221,9 +221,9 @@ public interface TableExcelExporter extends ExcelExporter {
 	 * @param headerName
 	 * @return
 	 */
-	default excel.exporter.config.HeaderName toHeaderName(HeaderName headerName) {
-		excel.exporter.config.HeaderName headerNameSetting = (excel.exporter.config.HeaderName) convertAnnotationToConcreteObject(
-				new excel.exporter.config.HeaderName(), headerName);
+	default excel.exporter.datainfo.HeaderName toHeaderName(HeaderName headerName) {
+		excel.exporter.datainfo.HeaderName headerNameSetting = (excel.exporter.datainfo.HeaderName) convertAnnotationToConcreteObject(
+				new excel.exporter.datainfo.HeaderName(), headerName);
 		return headerNameSetting;
 	}
 

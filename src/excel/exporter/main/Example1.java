@@ -1,6 +1,6 @@
 package excel.exporter.main;
 
-import excel.exporter.config.FontInfo;
+import excel.exporter.datainfo.FontInfo;
 import lombok.Data;
 
 @Data

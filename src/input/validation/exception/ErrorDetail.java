@@ -1,5 +1,7 @@
 package input.validation.exception;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 public class ErrorDetail {
 
 	private Object value;
@@ -47,7 +49,7 @@ public class ErrorDetail {
 
 	@Override
 	public String toString() {
-		return "ErrorDetail [errorType=" + errorType + ", cause=" + cause + ", value=" + value.toString() + "]";
+		return ToStringBuilder.reflectionToString(this);
 	}
 
 }

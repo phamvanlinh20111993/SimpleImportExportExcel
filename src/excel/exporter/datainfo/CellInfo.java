@@ -1,4 +1,4 @@
-package excel.exporter.config;
+package excel.exporter.datainfo;
 
 import java.awt.Color;
 

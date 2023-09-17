@@ -5,6 +5,9 @@ import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Iterator;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import input.validation.annotation.Max;
 import input.validation.annotation.Min;
 import input.validation.annotation.NotEmpty;
@@ -24,8 +27,12 @@ import input.validation.validate.StringTypeValidation;
 import input.validation.validate.ValidationHandler;
 
 public abstract class SimpleAbstractHandleRowData<R> implements RowDataHandle<R> {
+	
+	private static final Logger logger = LoggerFactory.getLogger(SimpleAbstractHandleRowData.class);
 
 	protected R rowData;
+	
+	public SimpleAbstractHandleRowData() {}
 
 	public SimpleAbstractHandleRowData(R rowData) {
 		this.rowData = rowData;
@@ -71,8 +78,10 @@ public abstract class SimpleAbstractHandleRowData<R> implements RowDataHandle<R>
 				}
 
 			} catch (IllegalArgumentException e) {
+				logger.error("Error SimpleAbstractHandleRowData.traversalObjectProperty() {}", e.getMessage());
 				System.err.println(e.getMessage());
 			} catch (IllegalAccessException e) {
+				logger.error("Error SimpleAbstractHandleRowData.traversalObjectProperty() {}", e.getMessage());
 				System.err.println(e.getMessage());
 			}
 		}
