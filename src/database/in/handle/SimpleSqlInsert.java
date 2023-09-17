@@ -10,12 +10,16 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.apache.commons.text.StringEscapeUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import database.in.utils.TransactionIsolationLevel;
 import database.in.utils.Utils;
 
 public class SimpleSqlInsert<T> extends AbstractSqlInsert<T> {
-
+	
+	private static final Logger logger = LoggerFactory.getLogger(SimpleSqlInsert.class);
+	
 	public SimpleSqlInsert(DataSource dataSource) {
 		super();
 		this.dataSource = dataSource;
@@ -29,6 +33,7 @@ public class SimpleSqlInsert<T> extends AbstractSqlInsert<T> {
 
 	@Override
 	public String singleInsertValue(T entity) {
+		logger.info("SimpleSqlInsert.singleInsertValue() start"); 
 		String insertQuery = this.createInsertPrefixCommand(entity) + SPACE + INSERT_VALUE_KEY + SPACE
 				+ this.createInsertSuffixCommand(entity);
 
@@ -65,12 +70,17 @@ public class SimpleSqlInsert<T> extends AbstractSqlInsert<T> {
 		if (result > 0) {
 			return "inserted " + result;
 		}
+		
+		logger.info("SimpleSqlInsert.singleInsertValue() end"); 
 
 		return "fail single inserted";
 	}
 
 	@Override
 	public String batchInsertValues(List<T> entities, boolean isForceInsert) {
+		
+		logger.info("SimpleSqlInsert.batchInsertValues() start"); 
+		
 		if (entities == null || entities.size() == 0) {
 			return EMPTY;
 		}
@@ -122,6 +132,8 @@ public class SimpleSqlInsert<T> extends AbstractSqlInsert<T> {
 		if (isForceInsert) {
 			return "still insert despite some error";
 		}
+		
+		logger.info("SimpleSqlInsert.batchInsertValues() end"); 
 
 		return "fail batch inserted";
 	}

@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -150,5 +149,55 @@ public final class ObjectUtils {
 			System.err.println("Error ObjectUtils.getClass() " + e.getMessage());
 		}
 		return null;
+	}
+
+	/**
+	 * Copy updatedObject to current Object
+	 * 
+	 * @param currentObject
+	 * @param updatedObject
+	 * @param <T>
+	 *            Object type T
+	 * @param <K>
+	 *            Object type K
+	 * @return currentObject after mapping and update values with updatedObject
+	 */
+	public static <T, K> T updateProperties(T currentObject, K updatedObject) {
+		Field[] currentObjectFields = currentObject.getClass().getDeclaredFields();
+		Field[] updatedObjectFields = updatedObject.getClass().getDeclaredFields();
+
+		try {
+			for (Field currentObjectField : currentObjectFields) {
+				currentObjectField.setAccessible(true);
+				for (Field updatedObjectField : updatedObjectFields) {
+					updatedObjectField.setAccessible(true);
+					if (isSameField(currentObjectField, updatedObjectField)
+							&& org.apache.commons.lang3.ObjectUtils.allNotNull(updatedObjectField.get(updatedObject))) {
+						currentObjectField.set(currentObject, updatedObjectField.get(updatedObject));
+						break;
+					}
+				}
+			}
+		} catch (IllegalAccessException e) {
+			logger.debug("Can not copy field " + e.getMessage());
+		}
+
+		return currentObject;
+	}
+
+	/**
+	 * Check two is same name and same type
+	 * 
+	 * @param field
+	 *            property of class
+	 * @param compareField
+	 *            field to compare with field
+	 * @return boolean
+	 */
+	private static boolean isSameField(Field field, Field compareField) {
+		return field.getName().equals(compareField.getName()) &&
+		// check instance of or same type name Ex: Long with long is same type
+				(field.getType().isAssignableFrom(compareField.getType())
+						|| field.getType().getSimpleName().equalsIgnoreCase(compareField.getType().getSimpleName()));
 	}
 }

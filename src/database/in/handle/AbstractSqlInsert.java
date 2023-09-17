@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Types;
 
 import javax.sql.DataSource;
 
@@ -45,6 +46,11 @@ public abstract class AbstractSqlInsert<R> implements SqlInsert<R> {
 	}
 
 	protected void setPrepareStatement(PreparedStatement statement, Object value, int index) throws SQLException {
+		
+		if(value == null) {
+			statement.setNull(index, Types.NULL);
+		}
+		
 		if (value instanceof String) {
 			statement.setString(index, value.toString());
 			return;

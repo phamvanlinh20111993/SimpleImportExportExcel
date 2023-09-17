@@ -11,7 +11,7 @@ public interface SqlInsert<T> {
 
 	public String INSERT_VALUE_KEY = "VALUES";
 
-	public String SPACE = " ";
+	public String SPACE = Constants.BLANK;
 
 	public String EMPTY = Constants.EMPTY;
 

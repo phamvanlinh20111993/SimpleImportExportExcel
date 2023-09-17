@@ -1,4 +1,4 @@
-package main;
+package excel.importer.model;
 
 import java.math.BigDecimal;
 
@@ -7,7 +7,6 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import excel.importer.annotation.MappingField;
 import excel.importer.utils.CellType;
 import input.validation.annotation.Max;
-import input.validation.annotation.NotEmpty;
 import input.validation.annotation.NotNull;
 import input.validation.annotation.Size;
 import lombok.AllArgsConstructor;
@@ -17,7 +16,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PriceTableKiotVietDataModel {
+public class PriceTableKiotVietImportDataModel {
 
 	@Size(size = 8)
 	@NotNull

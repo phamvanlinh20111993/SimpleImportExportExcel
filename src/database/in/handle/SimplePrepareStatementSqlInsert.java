@@ -31,7 +31,7 @@ public class SimplePrepareStatementSqlInsert<T> extends AbstractSqlInsert<T> {
 
 	@Override
 	public String singleInsertValue(T entity) {
-
+		logger.info("SimplePrepareStatementSqlInsert.singleInsertValue() start");
 		String sqlInsertStatement = this.createInsertPrefixCommand(entity) + SPACE + INSERT_VALUE_KEY + SPACE
 				+ this.createInsertSuffixCommand(entity);
 
@@ -51,6 +51,7 @@ public class SimplePrepareStatementSqlInsert<T> extends AbstractSqlInsert<T> {
 			rs = statement.executeUpdate();
 			conn.commit();
 		} catch (SQLException e) {
+			System.err.println("SimplePrepareStatementSqlInsert.class singleInsertValue(): " + e.getMessage());
 			logger.error("SimplePrepareStatementSqlInsert.class singleInsertValue(): {}", e.getMessage());
 		} finally {
 			try {
@@ -61,6 +62,7 @@ public class SimplePrepareStatementSqlInsert<T> extends AbstractSqlInsert<T> {
 					conn.close();
 				}
 			} catch (SQLException e1) {
+				System.err.println("SimplePrepareStatementSqlInsert.class singleInsertValue(): " + e1.getMessage());
 				logger.error("SimplePrepareStatementSqlInsert.class singleInsertValue(): {}", e1.getMessage());
 			}
 		}
@@ -68,11 +70,17 @@ public class SimplePrepareStatementSqlInsert<T> extends AbstractSqlInsert<T> {
 		if (rs > -1) {
 			return "Inserted " + rs;
 		}
+
+		logger.info("SimplePrepareStatementSqlInsert.singleInsertValue() end");
+
 		return "fail single insert";
 	}
 
 	@Override
 	public String batchInsertValues(List<T> entities, boolean isForceInsert) {
+
+		logger.info("SimplePrepareStatementSqlInsert.batchInsertValues() start");
+
 		if (entities == null || entities.size() == 0) {
 			return EMPTY;
 		}
@@ -104,9 +112,11 @@ public class SimplePrepareStatementSqlInsert<T> extends AbstractSqlInsert<T> {
 				try {
 					conn.rollback();
 				} catch (SQLException e1) {
+					System.err.println("SimplePrepareStatementSqlInsert.class batchInsertValues(): " + e1.getMessage());
 					logger.error("SimplePrepareStatementSqlInsert.class batchInsertValues(): {}", e1.getMessage());
 				}
 			}
+			System.err.println("SimplePrepareStatementSqlInsert.class batchInsertValues(): " + e.getMessage());
 			logger.error("SimplePrepareStatementSqlInsert.class batchInsertValues(): {}", e.getMessage());
 		} finally {
 			try {
@@ -117,9 +127,12 @@ public class SimplePrepareStatementSqlInsert<T> extends AbstractSqlInsert<T> {
 					conn.close();
 				}
 			} catch (SQLException e1) {
+				System.err.println("SimplePrepareStatementSqlInsert.class batchInsertValues(): " + e1.getMessage());
 				logger.error("SimplePrepareStatementSqlInsert.class batchInsertValues(): {}", e1.getMessage());
 			}
 		}
+
+		logger.info("SimplePrepareStatementSqlInsert.batchInsertValues() ends");
 
 		if (res != null) {
 			return "Inserted " + Utils.sum(res);
