@@ -8,7 +8,8 @@ import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.commons.dbcp2.BasicDataSource;
+import javax.sql.DataSource;
+
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -30,8 +31,11 @@ public class ExcelImportSimple {
 
 	private String pathFile;
 
-	public ExcelImportSimple(String pathFile) {
+	private DataSource datasource;
+
+	public ExcelImportSimple(String pathFile, DataSource datasource) {
 		this.pathFile = pathFile;
+		this.datasource = datasource;
 	}
 
 	/**
@@ -45,7 +49,6 @@ public class ExcelImportSimple {
 			Workbook workbook = pathFile.endsWith("xls") ? new HSSFWorkbook(file) : new XSSFWorkbook(file);
 			workbook.close();
 			file.close();
-
 			return workbook;
 		} catch (FileNotFoundException e) {
 			logger.error("ExcelImportSimple.createWorkBook(): {}", e.getMessage());
@@ -58,20 +61,28 @@ public class ExcelImportSimple {
 
 	/**
 	 * 
+	 * @param orginalList
+	 * @param size
 	 * @return
 	 */
-	protected BasicDataSource defaultDataSource() {
-		BasicDataSource dataSource = new BasicDataSource();
-		dataSource.setUrl("jdbc:mysql://localhost:3306/fake?useSSL=false");
-		dataSource.setUsername("root");
-		dataSource.setPassword("root");
+	protected <T> List<List<T>> paging(List<T> orginalList, int size) {
 
-		dataSource.setMinIdle(5);
-		dataSource.setMaxIdle(10);
-		dataSource.setMaxTotal(25);
-		dataSource.setMaxWaitMillis(30000);
+		if (orginalList == null || size > orginalList.size())
+			return List.of(orginalList);
 
-		return dataSource;
+		List<List<T>> cloneList = new LinkedList<>();
+		int originListSize = orginalList.size();
+		int tmp = 0;
+		while (tmp + size < originListSize) {
+			cloneList.add(orginalList.subList(tmp, tmp + size));
+			tmp += size;
+		}
+		
+		if (tmp < originListSize) {
+			cloneList.add(orginalList.subList(tmp, originListSize));
+		}
+
+		return cloneList;
 	}
 
 	/**
@@ -94,20 +105,23 @@ public class ExcelImportSimple {
 		logger.info("ExcelImportSimple.importToDatabase() starting import data from excel to database");
 		// import to database
 		SqlInsert<PriceTableKiotVietTableModel> sqlInsertCommand = new SimplePrepareStatementSqlInsert<PriceTableKiotVietTableModel>(
-				defaultDataSource(), TransactionIsolationLevel.TRANSACTION_REPEATABLE_READ);
+				datasource, TransactionIsolationLevel.TRANSACTION_REPEATABLE_READ);
 		// Get data from excel file
 		for (List<Object> tableRow : datas) {
-			
+
 			// work, good point, insert single data
-//			for (Object row : tableRow) {
-//				System.out.println("Data " + row.toString());
-//				PriceTableKiotVietTableModel priceTableKiotVietTableModel = new PriceTableKiotVietTableModel();
-//				priceTableKiotVietTableModel = ObjectUtils.updateProperties(priceTableKiotVietTableModel, row);
-//				// import to database
-//				String result = sqlInsertCommand.singleInsertValue(priceTableKiotVietTableModel);
-//				System.out.println("Result " + result);
-//			}
-			
+			// for (Object row : tableRow) {
+			// System.out.println("Data " + row.toString());
+			// PriceTableKiotVietTableModel priceTableKiotVietTableModel = new
+			// PriceTableKiotVietTableModel();
+			// priceTableKiotVietTableModel =
+			// ObjectUtils.updateProperties(priceTableKiotVietTableModel, row);
+			// // import to database
+			// String result =
+			// sqlInsertCommand.singleInsertValue(priceTableKiotVietTableModel);
+			// System.out.println("Result " + result);
+			// }
+
 			// insert multi data with batch insert
 			List<PriceTableKiotVietTableModel> kiotVietTableModels = new LinkedList<PriceTableKiotVietTableModel>();
 			for (Object row : tableRow) {
@@ -120,5 +134,50 @@ public class ExcelImportSimple {
 		}
 
 		logger.info("ExcelImportSimple.importToDatabase() end");
+	}
+
+	/**
+	 * 
+	 */
+	public void importToDatabase(int batchSize) {
+
+		logger.info("ExcelImportSimple.importToDatabase(int batchSize) start");
+
+		List<PriceTableKiotVietImportDataModel> models = List.of(new PriceTableKiotVietImportDataModel());
+
+		logger.info("ExcelImportSimple.importToDatabase(int batchSize) starting get data from excel");
+		Workbook workbook = createWorkBook(pathFile);
+		if (workbook == null)
+			throw new NullPointerException("Workbook can not be null");
+
+		TableExcelReader excelReader = new DefaultTableExcelReader(workbook, models);
+		List<List<Object>> datas = excelReader.executeImport();
+
+		logger.info("ExcelImportSimple.importToDatabase() starting import data from excel to database");
+		// import to database
+		SqlInsert<PriceTableKiotVietTableModel> sqlInsertCommand = new SimplePrepareStatementSqlInsert<PriceTableKiotVietTableModel>(
+				datasource, TransactionIsolationLevel.TRANSACTION_REPEATABLE_READ);
+		// Get data from excel file
+		for (List<Object> tableRow : datas) {
+			// insert multi data with batch insert
+			List<PriceTableKiotVietTableModel> kiotVietTableModels = new LinkedList<PriceTableKiotVietTableModel>();
+
+			for (Object row : tableRow) {
+				PriceTableKiotVietTableModel priceTableKiotVietTableModel = new PriceTableKiotVietTableModel();
+				priceTableKiotVietTableModel = ObjectUtils.updateProperties(priceTableKiotVietTableModel, row);
+				kiotVietTableModels.add(priceTableKiotVietTableModel);
+			}
+
+			// Paging
+			List<List<PriceTableKiotVietTableModel>> pagingList = paging(kiotVietTableModels, batchSize);
+
+			for (List<PriceTableKiotVietTableModel> list : pagingList) {
+				String result = sqlInsertCommand.batchInsertValues(list, true);
+				System.out.println("Result " + result);
+			}
+
+		}
+
+		logger.info("ExcelImportSimple.importToDatabase(int batchSize) end");
 	}
 }

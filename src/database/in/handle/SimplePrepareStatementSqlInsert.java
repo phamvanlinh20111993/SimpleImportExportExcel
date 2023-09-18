@@ -73,7 +73,7 @@ public class SimplePrepareStatementSqlInsert<T> extends AbstractSqlInsert<T> {
 
 		logger.info("SimplePrepareStatementSqlInsert.singleInsertValue() end");
 
-		return "fail single insert";
+		return "Fail single insert";
 	}
 
 	@Override
@@ -139,7 +139,7 @@ public class SimplePrepareStatementSqlInsert<T> extends AbstractSqlInsert<T> {
 		}
 
 		if (isForceInsert) {
-			return "still insert despite some error";
+			return "Still insert despite some error";
 		}
 
 		return "Fail batch insert";
