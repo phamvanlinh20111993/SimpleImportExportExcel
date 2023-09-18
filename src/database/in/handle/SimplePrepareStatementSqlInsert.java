@@ -14,6 +14,12 @@ import org.slf4j.LoggerFactory;
 import database.in.utils.TransactionIsolationLevel;
 import database.in.utils.Utils;
 
+/**
+ * 
+ * @author PhamLinh
+ *
+ * @param <T>
+ */
 public class SimplePrepareStatementSqlInsert<T> extends AbstractSqlInsert<T> {
 
 	private static final Logger logger = LoggerFactory.getLogger(SimplePrepareStatementSqlInsert.class);
@@ -94,7 +100,8 @@ public class SimplePrepareStatementSqlInsert<T> extends AbstractSqlInsert<T> {
 		PreparedStatement statement = null;
 		int[] res = null;
 		try {
-			conn = getConnection(isForceInsert);
+			boolean isAutoCommit = !isForceInsert;
+			conn = getConnection(isAutoCommit);
 			statement = conn.prepareStatement(sqlInsertStatement);
 			DatabaseMetaData dbmd = conn.getMetaData();
 			if (dbmd.supportsTransactionIsolationLevel(transactionIsolationLevel.getTypeValue())) {

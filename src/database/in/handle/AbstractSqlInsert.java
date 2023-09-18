@@ -14,6 +14,12 @@ import org.slf4j.LoggerFactory;
 
 import database.in.utils.TransactionIsolationLevel;
 
+/**
+ * 
+ * @author PhamLinh
+ *
+ * @param <R>
+ */
 public abstract class AbstractSqlInsert<R> implements SqlInsert<R> {
 
 	private static final Logger logger = LoggerFactory.getLogger(AbstractSqlInsert.class);
@@ -21,17 +27,29 @@ public abstract class AbstractSqlInsert<R> implements SqlInsert<R> {
 	protected DataSource dataSource;
 
 	protected TransactionIsolationLevel transactionIsolationLevel = TransactionIsolationLevel.TRANSACTION_READ_COMMITTED;
-
+	
+	/**
+	 * 
+	 * @param autoCommit
+	 * @return
+	 * @throws SQLException
+	 */
 	protected Connection getConnection(boolean autoCommit) throws SQLException {
-
-		if (dataSource == null)
+		if (dataSource == null) {
 			throw new NullPointerException("Datasource can not be null");
+		}
 
 		Connection conn = dataSource.getConnection();
 		conn.setAutoCommit(autoCommit);
 		return conn;
 	}
-
+	
+	/**
+	 * 
+	 * @param entity
+	 * @param statement
+	 * @throws SQLException
+	 */
 	protected void extractEntity(R entity, PreparedStatement statement) throws SQLException {
 		int index = 1;
 		for (Field field : entity.getClass().getDeclaredFields()) {
@@ -44,7 +62,14 @@ public abstract class AbstractSqlInsert<R> implements SqlInsert<R> {
 			}
 		}
 	}
-
+	
+	/**
+	 * 
+	 * @param statement
+	 * @param value
+	 * @param index
+	 * @throws SQLException
+	 */
 	protected void setPrepareStatement(PreparedStatement statement, Object value, int index) throws SQLException {
 		
 		if(value == null) {

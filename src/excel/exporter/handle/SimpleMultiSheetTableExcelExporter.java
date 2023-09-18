@@ -12,7 +12,7 @@ import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
 
 import excel.exporter.datainfo.SheetInfoSetting;
-import excel.exporter.enums.ExcelType;
+import utils.ExcelType;
 
 public class SimpleMultiSheetTableExcelExporter extends AbstractTableExcelExporter {
 	private List<List<?>> listOfListData;

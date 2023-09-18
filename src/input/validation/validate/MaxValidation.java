@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.Map;
 
 import input.validation.exception.ErrorDetail;
-import input.validation.exception.ValidationError;
 
 public class MaxValidation<T> implements ValidationHandler<T> {
 

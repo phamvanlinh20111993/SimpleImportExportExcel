@@ -19,10 +19,12 @@ import org.slf4j.LoggerFactory;
 import database.in.handle.SimplePrepareStatementSqlInsert;
 import database.in.handle.SqlInsert;
 import database.in.utils.TransactionIsolationLevel;
+import excel.exporter.exception.NotMappingTypeException;
 import excel.importer.handle.DefaultTableExcelReader;
 import excel.importer.handle.TableExcelReader;
 import excel.importer.model.PriceTableKiotVietImportDataModel;
-import excel.importer.model.PriceTableKiotVietTableModel;
+import excel.importer.model.PriceTableKiotVietTableEntity;
+import utils.ExcelType;
 import utils.ObjectUtils;
 
 public class ExcelImportSimple {
@@ -43,20 +45,45 @@ public class ExcelImportSimple {
 	 * @param fileName
 	 * @return
 	 */
-	protected Workbook createWorkBook(String fileName) {
+	protected Workbook createWorkBook(String path) {
+
+		if (path == null) {
+			throw new NullPointerException("path can not be null");
+		}
+
+		String[] filePath = getFileName().split("\\.");
+		String extention = filePath[filePath.length - 1];
+
+		if (!extention.equals(ExcelType.XLS.getTypeValue()) && !extention.equals(ExcelType.XLSX.getTypeValue())) {
+			throw new NotMappingTypeException("Not support type " + extention);
+		}
+
+		Workbook workbook = null;
 		try {
 			InputStream file = new FileInputStream(new File(this.pathFile));
-			Workbook workbook = pathFile.endsWith("xls") ? new HSSFWorkbook(file) : new XSSFWorkbook(file);
-			workbook.close();
+			if (extention.equals(ExcelType.XLS.getTypeValue())) {
+				workbook = new HSSFWorkbook(file);
+			} else if (extention.equals(ExcelType.XLSX.getTypeValue())) {
+				workbook = new XSSFWorkbook(file);
+			}
 			file.close();
+			workbook.close();
 			return workbook;
 		} catch (FileNotFoundException e) {
+			System.err.println("ExcelImportSimple.createWorkBook(): " + e.getMessage());
 			logger.error("ExcelImportSimple.createWorkBook(): {}", e.getMessage());
 		} catch (IOException e) {
+			System.err.println("ExcelImportSimple.createWorkBook(): " + e.getMessage());
 			logger.error("ExcelImportSimple.createWorkBook(): {}", e.getMessage());
 		}
 
-		return null;
+		return workbook;
+	}
+
+	private String getFileName() {
+		String[] paths = this.pathFile.split("/");
+		String fileName = paths[paths.length - 1];
+		return fileName;
 	}
 
 	/**
@@ -67,8 +94,9 @@ public class ExcelImportSimple {
 	 */
 	protected <T> List<List<T>> paging(List<T> orginalList, int size) {
 
-		if (orginalList == null || size > orginalList.size())
+		if (orginalList == null || size > orginalList.size()) {
 			return List.of(orginalList);
+		}
 
 		List<List<T>> cloneList = new LinkedList<>();
 		int originListSize = orginalList.size();
@@ -77,7 +105,7 @@ public class ExcelImportSimple {
 			cloneList.add(orginalList.subList(tmp, tmp + size));
 			tmp += size;
 		}
-		
+
 		if (tmp < originListSize) {
 			cloneList.add(orginalList.subList(tmp, originListSize));
 		}
@@ -96,15 +124,12 @@ public class ExcelImportSimple {
 
 		logger.info("ExcelImportSimple.importToDatabase() starting get data from excel");
 		Workbook workbook = createWorkBook(pathFile);
-		if (workbook == null)
-			throw new NullPointerException("Workbook can not be null");
-
 		TableExcelReader excelReader = new DefaultTableExcelReader(workbook, models);
 		List<List<Object>> datas = excelReader.executeImport();
 
 		logger.info("ExcelImportSimple.importToDatabase() starting import data from excel to database");
 		// import to database
-		SqlInsert<PriceTableKiotVietTableModel> sqlInsertCommand = new SimplePrepareStatementSqlInsert<PriceTableKiotVietTableModel>(
+		SqlInsert<PriceTableKiotVietTableEntity> sqlInsertCommand = new SimplePrepareStatementSqlInsert<PriceTableKiotVietTableEntity>(
 				datasource, TransactionIsolationLevel.TRANSACTION_REPEATABLE_READ);
 		// Get data from excel file
 		for (List<Object> tableRow : datas) {
@@ -112,8 +137,8 @@ public class ExcelImportSimple {
 			// work, good point, insert single data
 			// for (Object row : tableRow) {
 			// System.out.println("Data " + row.toString());
-			// PriceTableKiotVietTableModel priceTableKiotVietTableModel = new
-			// PriceTableKiotVietTableModel();
+			// PriceTableKiotVietTableEntity priceTableKiotVietTableModel = new
+			// PriceTableKiotVietTableEntity();
 			// priceTableKiotVietTableModel =
 			// ObjectUtils.updateProperties(priceTableKiotVietTableModel, row);
 			// // import to database
@@ -123,9 +148,9 @@ public class ExcelImportSimple {
 			// }
 
 			// insert multi data with batch insert
-			List<PriceTableKiotVietTableModel> kiotVietTableModels = new LinkedList<PriceTableKiotVietTableModel>();
+			List<PriceTableKiotVietTableEntity> kiotVietTableModels = new LinkedList<PriceTableKiotVietTableEntity>();
 			for (Object row : tableRow) {
-				PriceTableKiotVietTableModel priceTableKiotVietTableModel = new PriceTableKiotVietTableModel();
+				PriceTableKiotVietTableEntity priceTableKiotVietTableModel = new PriceTableKiotVietTableEntity();
 				priceTableKiotVietTableModel = ObjectUtils.updateProperties(priceTableKiotVietTableModel, row);
 				kiotVietTableModels.add(priceTableKiotVietTableModel);
 			}
@@ -147,31 +172,28 @@ public class ExcelImportSimple {
 
 		logger.info("ExcelImportSimple.importToDatabase(int batchSize) starting get data from excel");
 		Workbook workbook = createWorkBook(pathFile);
-		if (workbook == null)
-			throw new NullPointerException("Workbook can not be null");
-
 		TableExcelReader excelReader = new DefaultTableExcelReader(workbook, models);
 		List<List<Object>> datas = excelReader.executeImport();
 
 		logger.info("ExcelImportSimple.importToDatabase() starting import data from excel to database");
 		// import to database
-		SqlInsert<PriceTableKiotVietTableModel> sqlInsertCommand = new SimplePrepareStatementSqlInsert<PriceTableKiotVietTableModel>(
+		SqlInsert<PriceTableKiotVietTableEntity> sqlInsertCommand = new SimplePrepareStatementSqlInsert<PriceTableKiotVietTableEntity>(
 				datasource, TransactionIsolationLevel.TRANSACTION_REPEATABLE_READ);
 		// Get data from excel file
 		for (List<Object> tableRow : datas) {
 			// insert multi data with batch insert
-			List<PriceTableKiotVietTableModel> kiotVietTableModels = new LinkedList<PriceTableKiotVietTableModel>();
+			List<PriceTableKiotVietTableEntity> kiotVietTableModels = new LinkedList<PriceTableKiotVietTableEntity>();
 
 			for (Object row : tableRow) {
-				PriceTableKiotVietTableModel priceTableKiotVietTableModel = new PriceTableKiotVietTableModel();
+				PriceTableKiotVietTableEntity priceTableKiotVietTableModel = new PriceTableKiotVietTableEntity();
 				priceTableKiotVietTableModel = ObjectUtils.updateProperties(priceTableKiotVietTableModel, row);
 				kiotVietTableModels.add(priceTableKiotVietTableModel);
 			}
 
 			// Paging
-			List<List<PriceTableKiotVietTableModel>> pagingList = paging(kiotVietTableModels, batchSize);
+			List<List<PriceTableKiotVietTableEntity>> pagingList = paging(kiotVietTableModels, batchSize);
 
-			for (List<PriceTableKiotVietTableModel> list : pagingList) {
+			for (List<PriceTableKiotVietTableEntity> list : pagingList) {
 				String result = sqlInsertCommand.batchInsertValues(list, true);
 				System.out.println("Result " + result);
 			}

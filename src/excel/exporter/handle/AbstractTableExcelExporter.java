@@ -30,8 +30,8 @@ import excel.exporter.datainfo.ColumnInfo;
 import excel.exporter.datainfo.HeaderInfo;
 import excel.exporter.datainfo.SheetInfo;
 import excel.exporter.datainfo.SheetInfoSetting;
-import excel.exporter.enums.ExcelType;
 import excel.exporter.enums.HeaderNameFormatType;
+import utils.ExcelType;
 import utils.ObjectUtils;
 
 public abstract class AbstractTableExcelExporter implements TableExcelExporter {

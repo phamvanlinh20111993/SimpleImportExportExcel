@@ -18,7 +18,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
 
 import excel.exporter.datainfo.SheetInfoSetting;
-import excel.exporter.enums.ExcelType;
+import utils.ExcelType;
 
 public class SimpleSingleSheetTableExcelExporter<T extends Object> extends AbstractTableExcelExporter {
 

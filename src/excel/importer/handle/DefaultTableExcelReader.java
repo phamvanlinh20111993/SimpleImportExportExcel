@@ -17,6 +17,11 @@ import excel.importer.utils.CellType;
 import input.validation.handle.RowDataHandle;
 import input.validation.handle.SimpleHandleRowData;
 
+/**
+ * 
+ * @author PhamLinh
+ *
+ */
 public class DefaultTableExcelReader extends AbstractTableExcelReader {
 
 	private static final Logger logger = LoggerFactory.getLogger(DefaultTableExcelReader.class);

@@ -20,6 +20,11 @@ import excel.importer.exception.HeaderColumnException;
 import excel.importer.exception.NotMappingTableHeaderException;
 import excel.importer.utils.CellType;
 
+/**
+ * 
+ * @author PhamLinh
+ *
+ */
 public abstract class AbstractTableExcelReader implements TableExcelReader {
 
 	private static final Logger logger = LoggerFactory.getLogger(AbstractTableExcelReader.class);

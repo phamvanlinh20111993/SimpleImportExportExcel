@@ -7,12 +7,12 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import excel.exporter.enums.ExcelType;
 import excel.exporter.handle.SimpleMultiSheetTableExcelExporter;
 import excel.exporter.handle.SimpleSingleSheetTableExcelExporter;
 import excel.exporter.handle.TableExcelExporter;
 import excel.exporter.model.Employee;
 import excel.exporter.model.Employee1;
+import utils.ExcelType;
 
 public class Main {
 

@@ -16,6 +16,12 @@ import org.slf4j.LoggerFactory;
 import database.in.utils.TransactionIsolationLevel;
 import database.in.utils.Utils;
 
+/**
+ * 
+ * @author PhamLinh
+ *
+ * @param <T>
+ */
 public class SimpleSqlInsert<T> extends AbstractSqlInsert<T> {
 
 	private static final Logger logger = LoggerFactory.getLogger(SimpleSqlInsert.class);
@@ -30,7 +36,10 @@ public class SimpleSqlInsert<T> extends AbstractSqlInsert<T> {
 		this.dataSource = dataSource;
 		this.transactionIsolationLevel = transactionIsolationLevel;
 	}
-
+	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String singleInsertValue(T entity) {
 		logger.info("SimpleSqlInsert.singleInsertValue() start");
@@ -77,7 +86,9 @@ public class SimpleSqlInsert<T> extends AbstractSqlInsert<T> {
 
 		return "Fail single inserted";
 	}
-
+	/**
+	 *  {@inheritDoc}
+	 */
 	@Override
 	public String batchInsertValues(List<T> entities, boolean isForceInsert) {
 
@@ -93,7 +104,8 @@ public class SimpleSqlInsert<T> extends AbstractSqlInsert<T> {
 		Statement statement = null;
 		int[] result = null;
 		try {
-			conn = getConnection(isForceInsert);
+			boolean isAutoCommit = !isForceInsert;
+			conn = getConnection(isAutoCommit);
 			statement = conn.createStatement();
 			DatabaseMetaData dbmd = conn.getMetaData();
 			if (dbmd.supportsTransactionIsolationLevel(transactionIsolationLevel.getTypeValue())) {
