@@ -85,9 +85,9 @@ public class DefaultTableExcelReader extends AbstractTableExcelReader {
 					rowDataHandle.validateColumns();
 
 					if (rowDataHandle.isRowDataError()) {
-						System.err.println(
-								"Error DefaultTableExcelReader.executeImport() " + rowDataHandle.getErrorDetails());
-						logger.error("Error this record {}", realObj.get());
+						logger.error("Error DefaultTableExcelReader.executeImport() {}",
+								rowDataHandle.getErrorDetails());
+						logger.error("Error DefaultTableExcelReader.executeImport() {}", realObj.get());
 						continue;
 					}
 

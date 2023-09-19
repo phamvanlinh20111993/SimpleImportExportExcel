@@ -18,11 +18,19 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
 
 import excel.exporter.datainfo.SheetInfoSetting;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import utils.ExcelType;
 
+@Data
+@EqualsAndHashCode(callSuper = false)
 public class SimpleSingleSheetTableExcelExporter<T extends Object> extends AbstractTableExcelExporter {
 
 	private List<T> listData;
+
+	public SimpleSingleSheetTableExcelExporter() {
+
+	}
 
 	public SimpleSingleSheetTableExcelExporter(String fileName, List<T> listData) {
 		super(fileName);
@@ -98,7 +106,7 @@ public class SimpleSingleSheetTableExcelExporter<T extends Object> extends Abstr
 		}
 		return infoSettings;
 	}
-	
+
 	/**
 	 * 
 	 * @param commentStr

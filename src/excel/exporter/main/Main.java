@@ -1,15 +1,12 @@
 package excel.exporter.main;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import excel.exporter.handle.SimpleMultiSheetTableExcelExporter;
-import excel.exporter.handle.SimpleSingleSheetTableExcelExporter;
-import excel.exporter.handle.TableExcelExporter;
+import excel.exporter.ExcelExportSimple;
 import excel.exporter.model.Employee;
 import excel.exporter.model.Employee1;
 import utils.ExcelType;
@@ -58,34 +55,28 @@ public class Main {
 		em31.setDate(date);
 		lists1.add(em31);
 
-		TableExcelExporter excelExporter = new SimpleSingleSheetTableExcelExporter<>("employee", lists);
+		String outputPath = "E:\\";
 
-		try {
-			excelExporter.out("E:\\");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		ExcelExportSimple excelExportSimple = new ExcelExportSimple();
 
-		TableExcelExporter excelExporter1 = new SimpleSingleSheetTableExcelExporter<>("employee11", lists1,
-				ExcelType.XLSX);
+		excelExportSimple.setDataSheets(List.of(lists));
+		excelExportSimple.setFileName("employee");
+		excelExportSimple.setOutputPath(outputPath);
+		excelExportSimple.export(ExcelType.XLSX);
 
-		try {
-			excelExporter1.out("E:\\");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		excelExportSimple.setDataSheets(List.of(lists1));
+		excelExportSimple.setFileName("employee1");
+		excelExportSimple.setOutputPath(outputPath);
+		excelExportSimple.export(ExcelType.XLSX);
 
 		List<List<?>> multiListData = new LinkedList<List<?>>();
 		multiListData.add(lists);
 		multiListData.add(lists1);
-		TableExcelExporter excelExporter2 = new SimpleMultiSheetTableExcelExporter("employee_multi", multiListData,
-				ExcelType.XLSX);
 
-		try {
-			excelExporter2.out("E:\\");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		excelExportSimple.setDataSheets(multiListData);
+		excelExportSimple.setFileName("employee-data");
+		excelExportSimple.setOutputPath(outputPath);
+		excelExportSimple.export(ExcelType.XLSX);
 
 	}
 

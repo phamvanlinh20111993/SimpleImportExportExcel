@@ -63,7 +63,6 @@ public class SimpleSqlInsert<T> extends AbstractSqlInsert<T> {
 
 		} catch (SQLException e) {
 			logger.error("SimpleSqlInsert.class singleInsertValue(): {}", e.getMessage());
-			System.err.println("SimpleSqlInsert.class singleInsertValue(): " + e.getMessage());
 		} finally {
 			try {
 				if (statement != null) {
@@ -74,7 +73,6 @@ public class SimpleSqlInsert<T> extends AbstractSqlInsert<T> {
 				}
 			} catch (SQLException e1) {
 				logger.error("SimpleSqlInsert.class singleInsertValue(): {}", e1.getMessage());
-				System.err.println("SimpleSqlInsert.class singleInsertValue(): " + e1.getMessage());
 			}
 		}
 
@@ -119,12 +117,11 @@ public class SimpleSqlInsert<T> extends AbstractSqlInsert<T> {
 			result = statement.executeBatch();
 		} catch (SQLException e) {
 			logger.error("SimpleSqlInsert.class batchInsertValues(): {}", e.getMessage());
-			System.err.println("SimpleSqlInsert.class batchInsertValues(): " + e.getMessage());
 			if (!isForceInsert) {
 				try {
 					conn.rollback();
 				} catch (SQLException e1) {
-					System.err.println(e1.getMessage());
+					logger.error("SimpleSqlInsert.class batchInsertValues(): {}", e1.getMessage());
 				}
 			}
 		} finally {
@@ -136,7 +133,7 @@ public class SimpleSqlInsert<T> extends AbstractSqlInsert<T> {
 					conn.close();
 				}
 			} catch (SQLException e1) {
-				System.err.println(e1.getMessage());
+				logger.error("SimpleSqlInsert.class batchInsertValues(): {}", e1.getMessage());
 			}
 		}
 
@@ -184,7 +181,7 @@ public class SimpleSqlInsert<T> extends AbstractSqlInsert<T> {
 				insertsuffixCommand.append(this.protectValue(value));
 				insertsuffixCommand.append(COMMA);
 			} catch (IllegalArgumentException | IllegalAccessException e) {
-				System.err.println(e.getMessage());
+				logger.error("SimpleSqlInsert.class createInsertSuffixCommand(): {}", e.getMessage());
 			}
 		}
 

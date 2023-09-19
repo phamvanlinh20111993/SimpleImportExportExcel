@@ -84,7 +84,6 @@ public final class ObjectUtils {
 					return false;
 				}
 			} catch (IllegalArgumentException | IllegalAccessException e) {
-				System.err.println("Error ObjectUtils.isEmpty() " + e.getMessage());
 				logger.error("Error ObjectUtils.isEmpty() {}", e.getMessage());
 			}
 		}
@@ -130,7 +129,6 @@ public final class ObjectUtils {
 			}
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
 				| NoSuchMethodException | SecurityException e) {
-			System.err.println("Error ObjectUtils.createInstanceFromPackage() " + e.getMessage());
 			logger.error("Error ObjectUtils.createInstanceFromPackage() %s", e.getMessage());
 		}
 		return Optional.empty();
@@ -144,9 +142,9 @@ public final class ObjectUtils {
 	 */
 	private static Class<?> getClass(String className, String packageName) {
 		try {
-			return Class.forName(packageName + "." + className.substring(0, className.lastIndexOf('.')));
+			return Class.forName(packageName + Constants.DOT + className.substring(0, className.lastIndexOf('.')));
 		} catch (ClassNotFoundException e) {
-			System.err.println("Error ObjectUtils.getClass() " + e.getMessage());
+			logger.error("Error ObjectUtils.getClass() {}", e.getMessage());
 		}
 		return null;
 	}
@@ -179,7 +177,7 @@ public final class ObjectUtils {
 				}
 			}
 		} catch (IllegalAccessException e) {
-			logger.debug("Can not copy field " + e.getMessage());
+			logger.error("ObjectUtils.updateProperties() Can not copy field {}", e.getMessage());
 		}
 
 		return currentObject;

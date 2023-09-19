@@ -70,10 +70,8 @@ public class ExcelImportSimple {
 			workbook.close();
 			return workbook;
 		} catch (FileNotFoundException e) {
-			System.err.println("ExcelImportSimple.createWorkBook(): " + e.getMessage());
 			logger.error("ExcelImportSimple.createWorkBook(): {}", e.getMessage());
 		} catch (IOException e) {
-			System.err.println("ExcelImportSimple.createWorkBook(): " + e.getMessage());
 			logger.error("ExcelImportSimple.createWorkBook(): {}", e.getMessage());
 		}
 
@@ -155,7 +153,7 @@ public class ExcelImportSimple {
 				kiotVietTableModels.add(priceTableKiotVietTableModel);
 			}
 			String result = sqlInsertCommand.batchInsertValues(kiotVietTableModels, true);
-			System.out.println("Result " + result);
+			logger.info("ExcelImportSimple.importToDatabase() Result {}" , result);
 		}
 
 		logger.info("ExcelImportSimple.importToDatabase() end");
@@ -195,7 +193,7 @@ public class ExcelImportSimple {
 
 			for (List<PriceTableKiotVietTableEntity> list : pagingList) {
 				String result = sqlInsertCommand.batchInsertValues(list, true);
-				System.out.println("Result " + result);
+				logger.info("ExcelImportSimple.importToDatabase(int batchSize) Result {}" , result);
 			}
 
 		}

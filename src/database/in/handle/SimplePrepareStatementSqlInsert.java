@@ -57,7 +57,6 @@ public class SimplePrepareStatementSqlInsert<T> extends AbstractSqlInsert<T> {
 			rs = statement.executeUpdate();
 			conn.commit();
 		} catch (SQLException e) {
-			System.err.println("SimplePrepareStatementSqlInsert.class singleInsertValue(): " + e.getMessage());
 			logger.error("SimplePrepareStatementSqlInsert.class singleInsertValue(): {}", e.getMessage());
 		} finally {
 			try {
@@ -68,7 +67,6 @@ public class SimplePrepareStatementSqlInsert<T> extends AbstractSqlInsert<T> {
 					conn.close();
 				}
 			} catch (SQLException e1) {
-				System.err.println("SimplePrepareStatementSqlInsert.class singleInsertValue(): " + e1.getMessage());
 				logger.error("SimplePrepareStatementSqlInsert.class singleInsertValue(): {}", e1.getMessage());
 			}
 		}
@@ -119,11 +117,9 @@ public class SimplePrepareStatementSqlInsert<T> extends AbstractSqlInsert<T> {
 				try {
 					conn.rollback();
 				} catch (SQLException e1) {
-					System.err.println("SimplePrepareStatementSqlInsert.class batchInsertValues(): " + e1.getMessage());
 					logger.error("SimplePrepareStatementSqlInsert.class batchInsertValues(): {}", e1.getMessage());
 				}
 			}
-			System.err.println("SimplePrepareStatementSqlInsert.class batchInsertValues(): " + e.getMessage());
 			logger.error("SimplePrepareStatementSqlInsert.class batchInsertValues(): {}", e.getMessage());
 		} finally {
 			try {
@@ -134,7 +130,6 @@ public class SimplePrepareStatementSqlInsert<T> extends AbstractSqlInsert<T> {
 					conn.close();
 				}
 			} catch (SQLException e1) {
-				System.err.println("SimplePrepareStatementSqlInsert.class batchInsertValues(): " + e1.getMessage());
 				logger.error("SimplePrepareStatementSqlInsert.class batchInsertValues(): {}", e1.getMessage());
 			}
 		}

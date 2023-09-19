@@ -87,7 +87,6 @@ public interface TableExcelExporter extends ExcelExporter {
 
 			} catch (NoSuchFieldException | IllegalArgumentException | IllegalAccessException
 					| InvocationTargetException e) {
-				System.err.println("Error TableExcelExporter.convertAnnotationToConcreteObject() " + e.getMessage());
 				logger.error("Got error: TableExcelExporter.convertAnnotationToConcreteObject() {}", e.getMessage());
 			}
 		}

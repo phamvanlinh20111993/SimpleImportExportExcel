@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.apache.poi.ss.usermodel.Cell;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import excel.importer.annotation.MappingField;
 import excel.importer.utils.CellType;
@@ -17,6 +19,8 @@ import excel.importer.utils.Utility;
 import utils.Constants;
 
 public interface TableExcelReader extends ExcelReader {
+
+	public static final Logger logger = LoggerFactory.getLogger(TableExcelReader.class);
 
 	public List<Map<String, CellType>> configHeaders();
 
@@ -47,7 +51,7 @@ public interface TableExcelReader extends ExcelReader {
 			return Optional.of(obj);
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
 				| NoSuchMethodException | SecurityException e) {
-			System.out.println(e.getMessage());
+			logger.error("TableExcelReader.toObject() error {}", e.getMessage());
 		}
 
 		return Optional.empty();

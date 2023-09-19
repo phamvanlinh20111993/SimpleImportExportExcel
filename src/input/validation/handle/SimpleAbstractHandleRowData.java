@@ -85,10 +85,8 @@ public abstract class SimpleAbstractHandleRowData<R> implements RowDataHandle<R>
 
 			} catch (IllegalArgumentException e) {
 				logger.error("Error SimpleAbstractHandleRowData.traversalObjectProperty() {}", e.getMessage());
-				System.err.println(e.getMessage());
 			} catch (IllegalAccessException e) {
 				logger.error("Error SimpleAbstractHandleRowData.traversalObjectProperty() {}", e.getMessage());
-				System.err.println(e.getMessage());
 			}
 		}
 	}

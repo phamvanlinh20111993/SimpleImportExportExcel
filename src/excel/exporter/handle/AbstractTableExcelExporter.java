@@ -46,6 +46,9 @@ public abstract class AbstractTableExcelExporter implements TableExcelExporter {
 
 	private Integer initialRowIndex = 0;
 
+	public AbstractTableExcelExporter() {
+	}
+
 	public AbstractTableExcelExporter(String fileName) {
 		this.fileName = fileName;
 		this.workbook = createWorkBook();
@@ -86,7 +89,7 @@ public abstract class AbstractTableExcelExporter implements TableExcelExporter {
 			} else {
 				sheet.setColumnWidth(cellIndex, headerInfo.getWidth());
 			}
-			
+
 			if (headerInfo.getRow() != null) {
 				rowHead.setHeight(headerInfo.getRow().getHeight());
 			}
@@ -217,8 +220,6 @@ public abstract class AbstractTableExcelExporter implements TableExcelExporter {
 				createBody(sheet, sheetInfoSetting.getColumnInfos(), listRows);
 
 			} catch (IllegalArgumentException | IllegalAccessException e) {
-				System.err.println(
-						AbstractTableExcelExporter.class.getName() + " executeExport() error: " + e.getMessage());
 				logger.error(AbstractTableExcelExporter.class.getName() + " executeExport() error: {}", e.getMessage());
 			}
 			ind++;
@@ -256,7 +257,6 @@ public abstract class AbstractTableExcelExporter implements TableExcelExporter {
 		this.executeExport();
 		String exportPath = path + "\\" + this.fileName + "." + excelType.getTypeValue();
 		OutputStream fileOut = new FileOutputStream(exportPath);
-		System.out.println("Excel File has been created successfully " + exportPath);
 		logger.debug("Excel File has been created successfully {}", exportPath);
 		workbook.write(fileOut);
 	}
