@@ -65,7 +65,7 @@ public class DefaultTableExcelReader extends AbstractTableExcelReader {
 	@Override
 	public List<List<Object>> executeImport() {
 
-		logger.info("DefaultTableExcelReader.executeImport() start ");
+		logger.info("DefaultTableExcelReader.executeImport() start");
 
 		List<List<Object>> res = new LinkedList<List<Object>>();
 
@@ -80,10 +80,8 @@ public class DefaultTableExcelReader extends AbstractTableExcelReader {
 			for (Map<String, Object> prop : data) {
 				Optional<Object> realObj = toObject(objectTemplates.get(ind).getClass(), prop);
 				if (realObj.isPresent()) {
-
 					rowDataHandle = new SimpleHandleRowData<>(realObj.get());
 					rowDataHandle.validateColumns();
-
 					if (rowDataHandle.isRowDataError()) {
 						logger.error("Error DefaultTableExcelReader.executeImport() {}",
 								rowDataHandle.getErrorDetails());

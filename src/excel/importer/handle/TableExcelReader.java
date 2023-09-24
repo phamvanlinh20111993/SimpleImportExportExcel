@@ -104,56 +104,45 @@ public interface TableExcelReader extends ExcelReader {
 		case STRING:
 			cellData = rawData.isPresent() ? Optional.of(rawData.get().toString()) : Optional.of(Constants.EMPTY);
 			break;
-
 		case BOOLEAN:
-
 			if (rawData.isPresent() && rawData.get() instanceof Boolean) {
 				cellData = Optional.of(rawData.get());
 			}
-
 			break;
-
 		case LONG:
 			if (rawData.isPresent()) {
 				cellData = Optional.of(Long.valueOf(rawData.get().toString()));
 			}
 			break;
-
 		case DOUBLE:
 			if (rawData.isPresent()) {
 				cellData = Optional.of(Double.valueOf(rawData.get().toString()));
 			}
 			break;
-
 		case DATE:
 			if (rawData.isPresent() && rawData.get() instanceof Date) {
 				cellData = Optional.of(rawData.get());
 			}
 			break;
-
 		case JSON:
 			String jsonStr = rawData.isPresent() ? rawData.toString() : "{}";
 			cellData = Optional.of(Utility.toMapObject(jsonStr));
 			break;
-
 		case ARRAY:
 			if (rawData.isPresent()) {
 				cellData = Optional.of(Utility.toArray(rawData.get().toString()));
 			}
 			break;
-
 		case LOCALDATETIME:
 			if (rawData.isPresent() && rawData.get() instanceof LocalDateTime) {
 				cellData = Optional.of(rawData.get());
 			}
 			break;
-
 		case DECIMAL:
 			if (rawData.isPresent()) {
 				cellData = Optional.of(new BigDecimal(rawData.get().toString()));
 			}
 			break;
-
 		default:
 			cellData = Optional.of(Constants.EMPTY);
 			break;

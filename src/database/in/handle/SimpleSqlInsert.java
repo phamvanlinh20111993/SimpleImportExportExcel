@@ -13,6 +13,7 @@ import org.apache.commons.text.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import database.in.utils.InsertCodeStatus;
 import database.in.utils.TransactionIsolationLevel;
 import database.in.utils.Utils;
 
@@ -36,9 +37,10 @@ public class SimpleSqlInsert<T> extends AbstractSqlInsert<T> {
 		this.dataSource = dataSource;
 		this.transactionIsolationLevel = transactionIsolationLevel;
 	}
-	
+
 	/**
-	 * {@inheritDoc}
+	 * {@inheritDoc} refer: https://www.baeldung.com/java-jdbc-auto-commit
+	 * https://stackoverflow.com/questions/14625371/rollback-batch-execution-when-using-jdbc-with-autocommit-true
 	 */
 	@Override
 	public String singleInsertValue(T entity) {
@@ -62,6 +64,11 @@ public class SimpleSqlInsert<T> extends AbstractSqlInsert<T> {
 			result = statement.executeUpdate(insertQuery);
 
 		} catch (SQLException e) {
+			try {
+				conn.rollback();
+			} catch (SQLException e1) {
+				logger.error("SimplePrepareStatementSqlInsert.class batchInsertValues(): {}", e1.getMessage());
+			}
 			logger.error("SimpleSqlInsert.class singleInsertValue(): {}", e.getMessage());
 		} finally {
 			try {
@@ -77,15 +84,17 @@ public class SimpleSqlInsert<T> extends AbstractSqlInsert<T> {
 		}
 
 		if (result > 0) {
-			return "Inserted " + result;
+			return InsertCodeStatus.SUCCESS.getTypeValue() + " " + result;
 		}
 
 		logger.info("SimpleSqlInsert.singleInsertValue() end");
 
-		return "Fail single inserted";
+		return InsertCodeStatus.FAIL.getTypeValue();
 	}
+
 	/**
-	 *  {@inheritDoc}
+	 * {@inheritDoc} refer
+	 * https://stackoverflow.com/questions/14625371/rollback-batch-execution-when-using-jdbc-with-autocommit-true
 	 */
 	@Override
 	public String batchInsertValues(List<T> entities, boolean isForceInsert) {
@@ -101,8 +110,9 @@ public class SimpleSqlInsert<T> extends AbstractSqlInsert<T> {
 		Connection conn = null;
 		Statement statement = null;
 		int[] result = null;
+
+		boolean isAutoCommit = !isForceInsert;
 		try {
-			boolean isAutoCommit = !isForceInsert;
 			conn = getConnection(isAutoCommit);
 			statement = conn.createStatement();
 			DatabaseMetaData dbmd = conn.getMetaData();
@@ -117,7 +127,7 @@ public class SimpleSqlInsert<T> extends AbstractSqlInsert<T> {
 			result = statement.executeBatch();
 		} catch (SQLException e) {
 			logger.error("SimpleSqlInsert.class batchInsertValues(): {}", e.getMessage());
-			if (!isForceInsert) {
+			if (!isAutoCommit) {
 				try {
 					conn.rollback();
 				} catch (SQLException e1) {
@@ -138,16 +148,16 @@ public class SimpleSqlInsert<T> extends AbstractSqlInsert<T> {
 		}
 
 		if (result != null) {
-			return "inserted " + Utils.sum(result);
+			return InsertCodeStatus.SUCCESS_FORCE_INSERT.getTypeValue() + " " + Utils.sum(result);
 		}
 
 		if (isForceInsert) {
-			return "still insert despite some error";
+			return InsertCodeStatus.FAIL_FORCE_INSERT.getTypeValue();
 		}
 
 		logger.info("SimpleSqlInsert.batchInsertValues() end");
 
-		return "Fail batch inserted";
+		return InsertCodeStatus.FAIL_FORCE_INSERT.getTypeValue();
 	}
 
 	/**

@@ -58,7 +58,7 @@ public abstract class AbstractSqlInsert<R> implements SqlInsert<R> {
 				Object valueObject = field.get(entity);
 				setPrepareStatement(statement, valueObject, index++);
 			} catch (IllegalArgumentException | IllegalAccessException e) {
-				logger.error("extractEntity(): {}", e.getMessage());
+				logger.error("AbstractSqlInsert.extractEntity(): {}", e.getMessage());
 			}
 		}
 	}
