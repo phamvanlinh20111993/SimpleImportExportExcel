@@ -111,7 +111,7 @@ public interface TableExcelExporter extends ExcelExporter {
 		SheetInfo sheetInfo = new SheetInfo();
 
 		Field[] fields = obj.getClass().getDeclaredFields();
-		// init data
+		// init responseData
 		for (int index = 0; index < fields.length; index++) {
 			columnInfos.add(new ColumnInfo());
 			headerInfos.add(new HeaderInfo());

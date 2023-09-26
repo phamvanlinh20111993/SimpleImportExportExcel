@@ -1,7 +1,7 @@
 package excel.importer.handle;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -16,6 +16,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import excel.importer.annotation.MappingField;
 import excel.importer.exception.HeaderColumnException;
 import excel.importer.exception.NotMappingTableHeaderException;
 import excel.importer.utils.CellType;
@@ -26,10 +27,42 @@ import excel.importer.utils.CellType;
  *
  */
 public abstract class AbstractTableExcelReader implements TableExcelReader {
+	
+	protected List<?> objectTemplates;
 
 	private static final Logger logger = LoggerFactory.getLogger(AbstractTableExcelReader.class);
+	
+	public AbstractTableExcelReader(List<?> objectTemplates) {
+		this.objectTemplates = objectTemplates;
+	}
+	
+	@Override
+	public List<Map<String, CellType>> configHeaders() {
 
-	private void validateSheet(Sheet sheet) throws NullPointerException {
+		logger.info("AbstractTableExcelReader.configHeaders() start ");
+
+		List<Map<String, CellType>> configHeaders = new LinkedList<Map<String, CellType>>();
+
+		for (Object template : objectTemplates) {
+			Field[] fields = template.getClass().getDeclaredFields();
+
+			Map<String, CellType> header = new LinkedHashMap<>();
+			for (Field field : fields) {
+				field.setAccessible(true);
+				if (field.isAnnotationPresent(MappingField.class)) {
+					MappingField mappingHeader = field.getAnnotation(MappingField.class);
+					header.put(mappingHeader.value(), mappingHeader.type());
+				}
+			}
+
+			configHeaders.add(header);
+		}
+
+		logger.info("AbstractTableExcelReader.configHeaders() end ");
+		return configHeaders;
+	}
+
+	protected void validateSheet(Sheet sheet) throws NullPointerException {
 		if (sheet == null)
 			throw new NullPointerException("Sheet can not be null");
 	}
@@ -92,7 +125,7 @@ public abstract class AbstractTableExcelReader implements TableExcelReader {
 
 		Map<String, Integer> headers = this.readHeaderFromSheet(sheet);
 
-		Map<Integer, String> invertheader = new HashMap<>();
+		Map<Integer, String> invertheader = new LinkedHashMap<>();
 
 		for (Map.Entry<String, Integer> header : headers.entrySet()) {
 			invertheader.put(header.getValue(), header.getKey());
@@ -100,7 +133,7 @@ public abstract class AbstractTableExcelReader implements TableExcelReader {
 
 		List<Map<String, Object>> rowDatas = new ArrayList<>();
 		for (int index = 1; index < sheet.getLastRowNum(); index++) {
-			Map<String, Object> rowData = new HashMap<>();
+			Map<String, Object> rowData = new LinkedHashMap<>();
 			for (Cell cell : sheet.getRow(index)) {
 				CellType cellTypeCustom = configHeader.get(invertheader.get(cell.getColumnIndex()));
 				Optional<?> data = toDataType(cell);

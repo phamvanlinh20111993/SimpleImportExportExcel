@@ -34,7 +34,9 @@ public class Main {
 		
 		// excelImportSimple.importToDatabase();
 		
-		excelImportSimple.importToDatabase(100);
+	//	excelImportSimple.importToDatabase(100);
+		
+		excelImportSimple.importBigDataToDatabase(12);
 		
 		 String log4jConfigFile = System.getProperty("user.dir")
 	                + File.separator + "log4j.xml";

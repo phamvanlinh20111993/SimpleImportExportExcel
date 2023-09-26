@@ -154,7 +154,7 @@ public abstract class AbstractTableExcelExporter implements TableExcelExporter {
 	 * 
 	 * @param sheet
 	 * @param columnInfos
-	 * @param data
+	 * @param responseData
 	 * @throws IllegalArgumentException
 	 * @throws IllegalAccessException
 	 */

@@ -150,4 +150,57 @@ public interface TableExcelReader extends ExcelReader {
 
 		return cellData;
 	}
+
+	/**
+	 * 
+	 * @param cell
+	 * @param cellType
+	 * @return
+	 */
+	default Optional<?> toDataType(String cell, CellType cellType) {
+
+		Optional<?> cellData = Optional.empty();
+		Optional<String> rawData = Optional.of(cell);
+
+		if (!rawData.isPresent()) {
+			return cellData;
+		}
+
+		switch (cellType) {
+		case STRING:
+			cellData = Optional.of(rawData.get());
+			break;
+		case BOOLEAN:
+			cellData = Optional.of(rawData.get());
+			break;
+		case LONG:
+			cellData = Optional.of(Long.valueOf(rawData.get()));
+			break;
+		case DOUBLE:
+			cellData = Optional.of(Double.valueOf(rawData.get()));
+			break;
+		case DATE:
+			cellData = Optional.of(rawData.get());
+			break;
+		case JSON:
+			cellData = Optional.of(Utility.toMapObject(rawData.get()));
+			break;
+		case ARRAY:
+			cellData = Optional.of(Utility.toArray(rawData.get()));
+			break;
+		case LOCALDATETIME:
+			cellData = Optional.of(rawData.get());
+			break;
+		case DECIMAL:
+			if (rawData.isPresent()) {
+				cellData = Optional.of(new BigDecimal(rawData.get()));
+			}
+			break;
+		default:
+			cellData = Optional.of(Constants.EMPTY);
+			break;
+		}
+
+		return cellData;
+	}
 }
