@@ -26,6 +26,12 @@ import input.validation.validate.SizeValidation;
 import input.validation.validate.StringTypeValidation;
 import input.validation.validate.ValidationHandler;
 
+/**
+ * 
+ * @author PhamLinh
+ *
+ * @param <R>
+ */
 public abstract class SimpleAbstractHandleRowData<R> implements RowDataHandle<R> {
 	
 	private static final Logger logger = LoggerFactory.getLogger(SimpleAbstractHandleRowData.class);
@@ -79,10 +85,8 @@ public abstract class SimpleAbstractHandleRowData<R> implements RowDataHandle<R>
 
 			} catch (IllegalArgumentException e) {
 				logger.error("Error SimpleAbstractHandleRowData.traversalObjectProperty() {}", e.getMessage());
-				System.err.println(e.getMessage());
 			} catch (IllegalAccessException e) {
 				logger.error("Error SimpleAbstractHandleRowData.traversalObjectProperty() {}", e.getMessage());
-				System.err.println(e.getMessage());
 			}
 		}
 	}

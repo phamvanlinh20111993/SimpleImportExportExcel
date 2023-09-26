@@ -12,10 +12,18 @@ import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
 
 import excel.exporter.datainfo.SheetInfoSetting;
-import excel.exporter.enums.ExcelType;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import utils.ExcelType;
 
+@Data
+@EqualsAndHashCode(callSuper = false)
 public class SimpleMultiSheetTableExcelExporter extends AbstractTableExcelExporter {
+
 	private List<List<?>> listOfListData;
+
+	public SimpleMultiSheetTableExcelExporter() {
+	}
 
 	public SimpleMultiSheetTableExcelExporter(String fileName, List<List<?>> listOfListData) {
 		super(fileName);

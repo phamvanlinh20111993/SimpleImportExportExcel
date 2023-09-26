@@ -5,6 +5,8 @@ import org.apache.commons.lang3.StringUtils;
 public final class Constants {
 
 	public static String EMPTY = StringUtils.EMPTY;
+	
+	public static String DOT = ".";
 
 	public static String BLANK = StringUtils.SPACE;
 

@@ -18,16 +18,33 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * 
+ * @author PhamLinh
+ *
+ */
 public final class Utility {
 
 	private static final Logger logger = LoggerFactory.getLogger(Utility.class);
-
+	
+	/**
+	 * 
+	 * @param dateStr
+	 * @param pattern
+	 * @return
+	 * @throws ParseException
+	 */
 	public static Date toDate(String dateStr, String pattern) throws ParseException {
 		DateFormat format = new SimpleDateFormat(pattern, Locale.ENGLISH);
 		Date date = format.parse(dateStr);
 		return date;
 	}
-
+	
+	/**
+	 * 
+	 * @param jsonStr
+	 * @return
+	 */
 	public static Map<String, Object> toMapObject(String jsonStr) {
 		ObjectMapper mapper = new ObjectMapper();
 

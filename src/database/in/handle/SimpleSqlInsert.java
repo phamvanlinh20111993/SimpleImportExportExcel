@@ -13,13 +13,20 @@ import org.apache.commons.text.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import database.in.utils.InsertCodeStatus;
 import database.in.utils.TransactionIsolationLevel;
 import database.in.utils.Utils;
 
+/**
+ * 
+ * @author PhamLinh
+ *
+ * @param <T>
+ */
 public class SimpleSqlInsert<T> extends AbstractSqlInsert<T> {
-	
+
 	private static final Logger logger = LoggerFactory.getLogger(SimpleSqlInsert.class);
-	
+
 	public SimpleSqlInsert(DataSource dataSource) {
 		super();
 		this.dataSource = dataSource;
@@ -31,9 +38,13 @@ public class SimpleSqlInsert<T> extends AbstractSqlInsert<T> {
 		this.transactionIsolationLevel = transactionIsolationLevel;
 	}
 
+	/**
+	 * {@inheritDoc} refer: https://www.baeldung.com/java-jdbc-auto-commit
+	 * https://stackoverflow.com/questions/14625371/rollback-batch-execution-when-using-jdbc-with-autocommit-true
+	 */
 	@Override
 	public String singleInsertValue(T entity) {
-		logger.info("SimpleSqlInsert.singleInsertValue() start"); 
+		logger.info("SimpleSqlInsert.singleInsertValue() start");
 		String insertQuery = this.createInsertPrefixCommand(entity) + SPACE + INSERT_VALUE_KEY + SPACE
 				+ this.createInsertSuffixCommand(entity);
 
@@ -53,7 +64,12 @@ public class SimpleSqlInsert<T> extends AbstractSqlInsert<T> {
 			result = statement.executeUpdate(insertQuery);
 
 		} catch (SQLException e) {
-			System.err.println(e.getMessage());
+			try {
+				conn.rollback();
+			} catch (SQLException e1) {
+				logger.error("SimplePrepareStatementSqlInsert.class batchInsertValues(): {}", e1.getMessage());
+			}
+			logger.error("SimpleSqlInsert.class singleInsertValue(): {}", e.getMessage());
 		} finally {
 			try {
 				if (statement != null) {
@@ -63,24 +79,28 @@ public class SimpleSqlInsert<T> extends AbstractSqlInsert<T> {
 					conn.close();
 				}
 			} catch (SQLException e1) {
-				System.err.println(e1.getMessage());
+				logger.error("SimpleSqlInsert.class singleInsertValue(): {}", e1.getMessage());
 			}
 		}
 
 		if (result > 0) {
-			return "inserted " + result;
+			return InsertCodeStatus.SUCCESS.getTypeValue() + " " + result;
 		}
-		
-		logger.info("SimpleSqlInsert.singleInsertValue() end"); 
 
-		return "fail single inserted";
+		logger.info("SimpleSqlInsert.singleInsertValue() end");
+
+		return InsertCodeStatus.FAIL.getTypeValue();
 	}
 
+	/**
+	 * {@inheritDoc} refer
+	 * https://stackoverflow.com/questions/14625371/rollback-batch-execution-when-using-jdbc-with-autocommit-true
+	 */
 	@Override
 	public String batchInsertValues(List<T> entities, boolean isForceInsert) {
-		
-		logger.info("SimpleSqlInsert.batchInsertValues() start"); 
-		
+
+		logger.info("SimpleSqlInsert.batchInsertValues() start");
+
 		if (entities == null || entities.size() == 0) {
 			return EMPTY;
 		}
@@ -90,8 +110,10 @@ public class SimpleSqlInsert<T> extends AbstractSqlInsert<T> {
 		Connection conn = null;
 		Statement statement = null;
 		int[] result = null;
+
+		boolean isAutoCommit = !isForceInsert;
 		try {
-			conn = getConnection(isForceInsert);
+			conn = getConnection(isAutoCommit);
 			statement = conn.createStatement();
 			DatabaseMetaData dbmd = conn.getMetaData();
 			if (dbmd.supportsTransactionIsolationLevel(transactionIsolationLevel.getTypeValue())) {
@@ -104,12 +126,12 @@ public class SimpleSqlInsert<T> extends AbstractSqlInsert<T> {
 			}
 			result = statement.executeBatch();
 		} catch (SQLException e) {
-			System.err.println(e.getMessage());
-			if (!isForceInsert) {
+			logger.error("SimpleSqlInsert.class batchInsertValues(): {}", e.getMessage());
+			if (!isAutoCommit) {
 				try {
 					conn.rollback();
 				} catch (SQLException e1) {
-					System.err.println(e1.getMessage());
+					logger.error("SimpleSqlInsert.class batchInsertValues(): {}", e1.getMessage());
 				}
 			}
 		} finally {
@@ -121,21 +143,21 @@ public class SimpleSqlInsert<T> extends AbstractSqlInsert<T> {
 					conn.close();
 				}
 			} catch (SQLException e1) {
-				System.err.println(e1.getMessage());
+				logger.error("SimpleSqlInsert.class batchInsertValues(): {}", e1.getMessage());
 			}
 		}
 
 		if (result != null) {
-			return "inserted " + Utils.sum(result);
+			return InsertCodeStatus.SUCCESS_FORCE_INSERT.getTypeValue() + " " + Utils.sum(result);
 		}
 
 		if (isForceInsert) {
-			return "still insert despite some error";
+			return InsertCodeStatus.FAIL_FORCE_INSERT.getTypeValue();
 		}
-		
-		logger.info("SimpleSqlInsert.batchInsertValues() end"); 
 
-		return "fail batch inserted";
+		logger.info("SimpleSqlInsert.batchInsertValues() end");
+
+		return InsertCodeStatus.FAIL_FORCE_INSERT.getTypeValue();
 	}
 
 	/**
@@ -169,7 +191,7 @@ public class SimpleSqlInsert<T> extends AbstractSqlInsert<T> {
 				insertsuffixCommand.append(this.protectValue(value));
 				insertsuffixCommand.append(COMMA);
 			} catch (IllegalArgumentException | IllegalAccessException e) {
-				System.err.println(e.getMessage());
+				logger.error("SimpleSqlInsert.class createInsertSuffixCommand(): {}", e.getMessage());
 			}
 		}
 

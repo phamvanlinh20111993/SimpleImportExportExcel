@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.apache.poi.ss.usermodel.Cell;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import excel.importer.annotation.MappingField;
 import excel.importer.utils.CellType;
@@ -17,6 +19,8 @@ import excel.importer.utils.Utility;
 import utils.Constants;
 
 public interface TableExcelReader extends ExcelReader {
+
+	public static final Logger logger = LoggerFactory.getLogger(TableExcelReader.class);
 
 	public List<Map<String, CellType>> configHeaders();
 
@@ -47,7 +51,7 @@ public interface TableExcelReader extends ExcelReader {
 			return Optional.of(obj);
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
 				| NoSuchMethodException | SecurityException e) {
-			System.out.println(e.getMessage());
+			logger.error("TableExcelReader.toObject() error {}", e.getMessage());
 		}
 
 		return Optional.empty();
@@ -100,56 +104,98 @@ public interface TableExcelReader extends ExcelReader {
 		case STRING:
 			cellData = rawData.isPresent() ? Optional.of(rawData.get().toString()) : Optional.of(Constants.EMPTY);
 			break;
-
 		case BOOLEAN:
-
 			if (rawData.isPresent() && rawData.get() instanceof Boolean) {
 				cellData = Optional.of(rawData.get());
 			}
-
 			break;
-
 		case LONG:
 			if (rawData.isPresent()) {
 				cellData = Optional.of(Long.valueOf(rawData.get().toString()));
 			}
 			break;
-
 		case DOUBLE:
 			if (rawData.isPresent()) {
 				cellData = Optional.of(Double.valueOf(rawData.get().toString()));
 			}
 			break;
-
 		case DATE:
 			if (rawData.isPresent() && rawData.get() instanceof Date) {
 				cellData = Optional.of(rawData.get());
 			}
 			break;
-
 		case JSON:
 			String jsonStr = rawData.isPresent() ? rawData.toString() : "{}";
 			cellData = Optional.of(Utility.toMapObject(jsonStr));
 			break;
-
 		case ARRAY:
 			if (rawData.isPresent()) {
 				cellData = Optional.of(Utility.toArray(rawData.get().toString()));
 			}
 			break;
-
 		case LOCALDATETIME:
 			if (rawData.isPresent() && rawData.get() instanceof LocalDateTime) {
 				cellData = Optional.of(rawData.get());
 			}
 			break;
-
 		case DECIMAL:
 			if (rawData.isPresent()) {
 				cellData = Optional.of(new BigDecimal(rawData.get().toString()));
 			}
 			break;
+		default:
+			cellData = Optional.of(Constants.EMPTY);
+			break;
+		}
 
+		return cellData;
+	}
+
+	/**
+	 * 
+	 * @param cell
+	 * @param cellType
+	 * @return
+	 */
+	default Optional<?> toDataType(String cell, CellType cellType) {
+
+		Optional<?> cellData = Optional.empty();
+		Optional<String> rawData = Optional.of(cell);
+
+		if (!rawData.isPresent()) {
+			return cellData;
+		}
+
+		switch (cellType) {
+		case STRING:
+			cellData = Optional.of(rawData.get());
+			break;
+		case BOOLEAN:
+			cellData = Optional.of(rawData.get());
+			break;
+		case LONG:
+			cellData = Optional.of(Long.valueOf(rawData.get()));
+			break;
+		case DOUBLE:
+			cellData = Optional.of(Double.valueOf(rawData.get()));
+			break;
+		case DATE:
+			cellData = Optional.of(rawData.get());
+			break;
+		case JSON:
+			cellData = Optional.of(Utility.toMapObject(rawData.get()));
+			break;
+		case ARRAY:
+			cellData = Optional.of(Utility.toArray(rawData.get()));
+			break;
+		case LOCALDATETIME:
+			cellData = Optional.of(rawData.get());
+			break;
+		case DECIMAL:
+			if (rawData.isPresent()) {
+				cellData = Optional.of(new BigDecimal(rawData.get()));
+			}
+			break;
 		default:
 			cellData = Optional.of(Constants.EMPTY);
 			break;

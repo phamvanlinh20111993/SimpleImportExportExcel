@@ -11,9 +11,16 @@ import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import database.in.utils.InsertCodeStatus;
 import database.in.utils.TransactionIsolationLevel;
 import database.in.utils.Utils;
 
+/**
+ * 
+ * @author PhamLinh
+ *
+ * @param <T>
+ */
 public class SimplePrepareStatementSqlInsert<T> extends AbstractSqlInsert<T> {
 
 	private static final Logger logger = LoggerFactory.getLogger(SimplePrepareStatementSqlInsert.class);
@@ -28,7 +35,11 @@ public class SimplePrepareStatementSqlInsert<T> extends AbstractSqlInsert<T> {
 		this.dataSource = dataSource;
 		this.transactionIsolationLevel = transactionIsolationLevel;
 	}
-
+	
+	/**
+	 * {@inheritDoc} refer: https://www.baeldung.com/java-jdbc-auto-commit
+	 * https://stackoverflow.com/questions/14625371/rollback-batch-execution-when-using-jdbc-with-autocommit-true
+	 */
 	@Override
 	public String singleInsertValue(T entity) {
 		logger.info("SimplePrepareStatementSqlInsert.singleInsertValue() start");
@@ -51,7 +62,11 @@ public class SimplePrepareStatementSqlInsert<T> extends AbstractSqlInsert<T> {
 			rs = statement.executeUpdate();
 			conn.commit();
 		} catch (SQLException e) {
-			System.err.println("SimplePrepareStatementSqlInsert.class singleInsertValue(): " + e.getMessage());
+			try {
+				conn.rollback();
+			} catch (SQLException e1) {
+				logger.error("SimplePrepareStatementSqlInsert.class batchInsertValues(): {}", e1.getMessage());
+			}
 			logger.error("SimplePrepareStatementSqlInsert.class singleInsertValue(): {}", e.getMessage());
 		} finally {
 			try {
@@ -62,20 +77,23 @@ public class SimplePrepareStatementSqlInsert<T> extends AbstractSqlInsert<T> {
 					conn.close();
 				}
 			} catch (SQLException e1) {
-				System.err.println("SimplePrepareStatementSqlInsert.class singleInsertValue(): " + e1.getMessage());
 				logger.error("SimplePrepareStatementSqlInsert.class singleInsertValue(): {}", e1.getMessage());
 			}
 		}
 
 		if (rs > -1) {
-			return "Inserted " + rs;
+			return InsertCodeStatus.SUCCESS.getTypeValue() + " " + rs;
 		}
 
 		logger.info("SimplePrepareStatementSqlInsert.singleInsertValue() end");
 
-		return "fail single insert";
+		return InsertCodeStatus.FAIL.getTypeValue();
 	}
 
+	/**
+	 * {@inheritDoc} refer: https://www.baeldung.com/java-jdbc-auto-commit
+	 * https://stackoverflow.com/questions/14625371/rollback-batch-execution-when-using-jdbc-with-autocommit-true
+	 */
 	@Override
 	public String batchInsertValues(List<T> entities, boolean isForceInsert) {
 
@@ -93,8 +111,9 @@ public class SimplePrepareStatementSqlInsert<T> extends AbstractSqlInsert<T> {
 		Connection conn = null;
 		PreparedStatement statement = null;
 		int[] res = null;
+		boolean isAutoCommit = !isForceInsert;
 		try {
-			conn = getConnection(isForceInsert);
+			conn = getConnection(isAutoCommit);
 			statement = conn.prepareStatement(sqlInsertStatement);
 			DatabaseMetaData dbmd = conn.getMetaData();
 			if (dbmd.supportsTransactionIsolationLevel(transactionIsolationLevel.getTypeValue())) {
@@ -106,17 +125,15 @@ public class SimplePrepareStatementSqlInsert<T> extends AbstractSqlInsert<T> {
 			}
 			res = statement.executeBatch();
 			conn.commit();
-			return "Inserted " + Utils.sum(res);
+			return InsertCodeStatus.SUCCESS_FORCE_INSERT + " " + Utils.sum(res);
 		} catch (SQLException e) {
-			if (!isForceInsert) {
+			if (!isAutoCommit) {
 				try {
 					conn.rollback();
 				} catch (SQLException e1) {
-					System.err.println("SimplePrepareStatementSqlInsert.class batchInsertValues(): " + e1.getMessage());
 					logger.error("SimplePrepareStatementSqlInsert.class batchInsertValues(): {}", e1.getMessage());
 				}
 			}
-			System.err.println("SimplePrepareStatementSqlInsert.class batchInsertValues(): " + e.getMessage());
 			logger.error("SimplePrepareStatementSqlInsert.class batchInsertValues(): {}", e.getMessage());
 		} finally {
 			try {
@@ -127,7 +144,6 @@ public class SimplePrepareStatementSqlInsert<T> extends AbstractSqlInsert<T> {
 					conn.close();
 				}
 			} catch (SQLException e1) {
-				System.err.println("SimplePrepareStatementSqlInsert.class batchInsertValues(): " + e1.getMessage());
 				logger.error("SimplePrepareStatementSqlInsert.class batchInsertValues(): {}", e1.getMessage());
 			}
 		}
@@ -135,13 +151,13 @@ public class SimplePrepareStatementSqlInsert<T> extends AbstractSqlInsert<T> {
 		logger.info("SimplePrepareStatementSqlInsert.batchInsertValues() ends");
 
 		if (res != null) {
-			return "Inserted " + Utils.sum(res);
+			return InsertCodeStatus.SUCCESS_FORCE_INSERT + " " + Utils.sum(res);
 		}
 
 		if (isForceInsert) {
-			return "still insert despite some error";
+			return "Still insert despite some error";
 		}
 
-		return "Fail batch insert";
+		return InsertCodeStatus.FAIL_FORCE_INSERT.getTypeValue();
 	}
 }

@@ -10,7 +10,7 @@ import lombok.Data;
 
 @Data
 @Table(name = "kiot_viet_price")
-public class PriceTableKiotVietTableModel {
+public class PriceTableKiotVietTableEntity {
 	@Column(name="code")
 	private String goodCode;
 	

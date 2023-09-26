@@ -1,9 +1,7 @@
 package utils;
 
 public enum ExcelType {
-	XSSF("Horrible Spreadsheet Format"), 
-	HSSF("XML Spreadsheet Format"),
-	SSXSSF("Streaming Horrible Spreadsheet Format");
+	XLSX("xlsx"), XLS("xls"), SXSSF("xlsx");
 
 	private String typeValue;
 

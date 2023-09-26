@@ -87,7 +87,6 @@ public interface TableExcelExporter extends ExcelExporter {
 
 			} catch (NoSuchFieldException | IllegalArgumentException | IllegalAccessException
 					| InvocationTargetException e) {
-				System.err.println("Error TableExcelExporter.convertAnnotationToConcreteObject() " + e.getMessage());
 				logger.error("Got error: TableExcelExporter.convertAnnotationToConcreteObject() {}", e.getMessage());
 			}
 		}
@@ -112,7 +111,7 @@ public interface TableExcelExporter extends ExcelExporter {
 		SheetInfo sheetInfo = new SheetInfo();
 
 		Field[] fields = obj.getClass().getDeclaredFields();
-		// init data
+		// init responseData
 		for (int index = 0; index < fields.length; index++) {
 			columnInfos.add(new ColumnInfo());
 			headerInfos.add(new HeaderInfo());
