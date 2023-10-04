@@ -61,12 +61,23 @@ public abstract class AbstractTableExcelReader implements TableExcelReader {
 		logger.info("AbstractTableExcelReader.configHeaders() end ");
 		return configHeaders;
 	}
-
+	
+	/**
+	 * 
+	 * @param sheet
+	 * @throws NullPointerException
+	 */
 	protected void validateSheet(Sheet sheet) throws NullPointerException {
 		if (sheet == null)
 			throw new NullPointerException("Sheet can not be null");
 	}
-
+	
+	/**
+	 * 
+	 * @param sheet
+	 * @param isStrictFormat
+	 * @param configHeader
+	 */
 	protected void validateHeader(Sheet sheet, boolean isStrictFormat, Map<String, CellType> configHeader) {
 
 		Map<String, Integer> headers = this.readHeaderFromSheet(sheet);
@@ -104,7 +115,12 @@ public abstract class AbstractTableExcelReader implements TableExcelReader {
 			}
 		}
 	}
-
+	
+	/**
+	 * 
+	 * @param sheet
+	 * @return
+	 */
 	protected Map<String, Integer> readHeaderFromSheet(Sheet sheet) {
 
 		validateSheet(sheet);
@@ -116,7 +132,13 @@ public abstract class AbstractTableExcelReader implements TableExcelReader {
 		}
 		return headerFields;
 	}
-
+	
+	/**
+	 * 
+	 * @param sheet
+	 * @param configHeader
+	 * @return
+	 */
 	protected List<Map<String, Object>> readBodyFromSheet(Sheet sheet, Map<String, CellType> configHeader) {
 
 		logger.info("AbstractTableExcelReader.readBodyFromSheet() start ");

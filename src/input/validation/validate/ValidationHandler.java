@@ -1,7 +1,7 @@
 package input.validation.validate;
 
 import input.validation.exception.ErrorDetail;
-import input.validation.exception.ValidationError;
+// import input.validation.exception.ValidationError;
 
 public interface ValidationHandler<T> {
 

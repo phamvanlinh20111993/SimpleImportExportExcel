@@ -43,7 +43,7 @@ public class SAXParserTableExcelReader extends AbstractTableExcelReader {
 	 * @param saxTableData
 	 * @return
 	 */
-	protected Map<String, Integer> readHeaderFromSheet(SaxTableData saxTableData) {
+	protected Map<String, Integer> readHeaderFromSheet(SAXTableData saxTableData) {
 
 		Map<String, Integer> headerFields = new LinkedHashMap<>();
 
@@ -54,8 +54,14 @@ public class SAXParserTableExcelReader extends AbstractTableExcelReader {
 		}
 		return headerFields;
 	}
-
-	protected List<Map<String, Object>> readBodyFromSheet(SaxTableData saxTableData,
+	
+	/**
+	 * 
+	 * @param saxTableData
+	 * @param configHeader
+	 * @return
+	 */
+	protected List<Map<String, Object>> readBodyFromSheet(SAXTableData saxTableData,
 			Map<String, CellType> configHeader) {
 
 		logger.info("SAXParserTableExcelReader.readBodyFromSheet() start ");
@@ -86,8 +92,14 @@ public class SAXParserTableExcelReader extends AbstractTableExcelReader {
 
 		return rowDatas;
 	}
-
-	protected void validateHeader(SaxTableData saxTableData, boolean isStrictFormat,
+	
+	/**
+	 * 
+	 * @param saxTableData
+	 * @param isStrictFormat
+	 * @param configHeader
+	 */
+	protected void validateHeader(SAXTableData saxTableData, boolean isStrictFormat,
 			Map<String, CellType> configHeader) {
 
 		Map<String, Integer> headers = this.readHeaderFromSheet(saxTableData);
@@ -179,9 +191,10 @@ public class SAXParserTableExcelReader extends AbstractTableExcelReader {
 		List<Map<String, CellType>> configHeadersMap = this.configHeaders();
 		try {
 			RawTableExcelSAXParserReader rawTableExcelSAXParserReader = new RawTableExcelSAXParserReader();
+			// refer: https://poi.apache.org/components/spreadsheet/quick-guide.html#FileInputStream
 			rawTableExcelSAXParserReader.readExcelFile(new File(pathFile));
 
-			List<SaxTableData> saxTableDatas = rawTableExcelSAXParserReader.getSaxTableData();
+			List<SAXTableData> saxTableDatas = rawTableExcelSAXParserReader.getSaxTableData();
 
 			for (int ind = 0; ind < saxTableDatas.size(); ind++) {
 				validateHeader(saxTableDatas.get(ind), true, configHeadersMap.get(ind));

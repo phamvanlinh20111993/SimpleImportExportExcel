@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class SaxTableData {
+public class SAXTableData {
 	
 	private Map<String, String> header = new LinkedHashMap<>();
 	

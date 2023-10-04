@@ -18,6 +18,7 @@ import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.streaming.SXSSFSheet;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -85,6 +86,9 @@ public abstract class AbstractTableExcelExporter implements TableExcelExporter {
 			}
 
 			if (headerInfo.getIsAutoWidth()) {
+				if (sheet instanceof SXSSFSheet) {
+					((SXSSFSheet) sheet).trackColumnForAutoSizing(cellIndex);
+				}
 				sheet.autoSizeColumn(cellIndex);
 			} else {
 				sheet.setColumnWidth(cellIndex, headerInfo.getWidth());
@@ -197,6 +201,7 @@ public abstract class AbstractTableExcelExporter implements TableExcelExporter {
 		logger.info(AbstractTableExcelExporter.class.getName() + " executeExport() start");
 		List<SheetInfoSetting> sheetInfoSettings = this.getSheetsSetting();
 
+		logger.info("sheetInfoSettings size is {}", sheetInfoSettings.size());
 		List<List<?>> data = this.getData();
 		int ind = 0;
 		List<Integer> sheetsRemove = new ArrayList<>();
@@ -248,6 +253,9 @@ public abstract class AbstractTableExcelExporter implements TableExcelExporter {
 	 * @return
 	 */
 	protected Workbook createWorkBook() {
+
+		logger.info("AbstractTableExcelExporter.createWorkBook() type is {}", excelType.getTypeValue());
+
 		return excelType.equals(ExcelType.XLSX) ? new XSSFWorkbook()
 				: excelType.equals(ExcelType.SXSSF) ? new SXSSFWorkbook() : new HSSFWorkbook();
 	}

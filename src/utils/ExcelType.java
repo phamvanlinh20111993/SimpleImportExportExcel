@@ -1,7 +1,9 @@
 package utils;
 
 public enum ExcelType {
-	XLSX("xlsx"), XLS("xls"), SXSSF("xlsx");
+	XLSX("xlsx"), 
+	XLS("xls"), 
+	SXSSF("xlsx");
 
 	private String typeValue;
 

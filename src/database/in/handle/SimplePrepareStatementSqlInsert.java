@@ -35,7 +35,7 @@ public class SimplePrepareStatementSqlInsert<T> extends AbstractSqlInsert<T> {
 		this.dataSource = dataSource;
 		this.transactionIsolationLevel = transactionIsolationLevel;
 	}
-	
+
 	/**
 	 * {@inheritDoc} refer: https://www.baeldung.com/java-jdbc-auto-commit
 	 * https://stackoverflow.com/questions/14625371/rollback-batch-execution-when-using-jdbc-with-autocommit-true
@@ -63,7 +63,9 @@ public class SimplePrepareStatementSqlInsert<T> extends AbstractSqlInsert<T> {
 			conn.commit();
 		} catch (SQLException e) {
 			try {
-				conn.rollback();
+				if (conn != null) {
+					conn.rollback();
+				}
 			} catch (SQLException e1) {
 				logger.error("SimplePrepareStatementSqlInsert.class batchInsertValues(): {}", e1.getMessage());
 			}
@@ -127,7 +129,7 @@ public class SimplePrepareStatementSqlInsert<T> extends AbstractSqlInsert<T> {
 			conn.commit();
 			return InsertCodeStatus.SUCCESS_FORCE_INSERT + " " + Utils.sum(res);
 		} catch (SQLException e) {
-			if (!isAutoCommit) {
+			if (!isAutoCommit && conn != null) {
 				try {
 					conn.rollback();
 				} catch (SQLException e1) {

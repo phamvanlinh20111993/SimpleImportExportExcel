@@ -45,6 +45,7 @@ public final class Utility {
 	 * @param jsonStr
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	public static Map<String, Object> toMapObject(String jsonStr) {
 		ObjectMapper mapper = new ObjectMapper();
 

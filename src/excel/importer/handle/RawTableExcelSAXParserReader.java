@@ -44,7 +44,7 @@ public class RawTableExcelSAXParserReader extends DefaultHandler {
 
 	private SharedStringsTable sharedStringsTable;
 
-	private List<SaxTableData> saxTableDatas = new LinkedList<>();
+	private List<SAXTableData> saxTableDatas = new LinkedList<>();
 
 	protected long rowNumber = 0;
 	protected String cellId;
@@ -178,7 +178,7 @@ public class RawTableExcelSAXParserReader extends DefaultHandler {
 				reponseAtSheet = new LinkedList<>();
 				while (sheetIterator.hasNext()) {
 					saxParser.parse(sheetIterator.next(), this);
-					saxTableDatas.add(new SaxTableData(cloneHeaderData(header), cloneListRowData(reponseAtSheet)));
+					saxTableDatas.add(new SAXTableData(cloneHeaderData(header), cloneListRowData(reponseAtSheet)));
 					header.clear();
 					reponseAtSheet.clear();
 				}
@@ -215,7 +215,7 @@ public class RawTableExcelSAXParserReader extends DefaultHandler {
 				while (sheetIterator.hasNext()) {
 					if (index++ == sheetIndex) {
 						saxParser.parse(sheetIterator.next(), this);
-						saxTableDatas.add(new SaxTableData(header, reponseAtSheet));
+						saxTableDatas.add(new SAXTableData(header, reponseAtSheet));
 						header.clear();
 						reponseAtSheet.clear();
 					}
@@ -253,7 +253,7 @@ public class RawTableExcelSAXParserReader extends DefaultHandler {
 				while (sheetIterator.hasNext()) {
 					if (sheetIndexes.contains(index++)) {
 						saxParser.parse(sheetIterator.next(), this);
-						saxTableDatas.add(new SaxTableData(header, reponseAtSheet));
+						saxTableDatas.add(new SAXTableData(header, reponseAtSheet));
 						header.clear();
 						reponseAtSheet.clear();
 					}
@@ -289,7 +289,7 @@ public class RawTableExcelSAXParserReader extends DefaultHandler {
 	 * 
 	 * @return
 	 */
-	public List<SaxTableData> getSaxTableData() {
+	public List<SAXTableData> getSaxTableData() {
 		return saxTableDatas;
 	}
 

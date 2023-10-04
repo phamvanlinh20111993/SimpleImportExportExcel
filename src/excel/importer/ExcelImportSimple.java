@@ -1,17 +1,19 @@
 package excel.importer;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.sql.DataSource;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.openxml4j.opc.OPCPackage;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,8 +47,9 @@ public class ExcelImportSimple {
 	 * 
 	 * @param fileName
 	 * @return
+	 * @throws InvalidFormatException
 	 */
-	protected Workbook createWorkBook(String path) {
+	protected Workbook createWorkBook(String path, boolean isStreamingMode) {
 
 		if (path == null) {
 			throw new NullPointerException("path can not be null");
@@ -60,20 +63,32 @@ public class ExcelImportSimple {
 		}
 
 		Workbook workbook = null;
+		// refer:
+		// https://poi.apache.org/components/spreadsheet/quick-guide.html#FileInputStream
 		try {
-			InputStream file = new FileInputStream(new File(this.pathFile));
 			if (extention.equals(ExcelType.XLS.getTypeValue())) {
-				workbook = new HSSFWorkbook(file);
+				POIFSFileSystem fs = new POIFSFileSystem(new File(this.pathFile));
+				workbook = new HSSFWorkbook(fs.getRoot(), true);
+				fs.close();
 			} else if (extention.equals(ExcelType.XLSX.getTypeValue())) {
-				workbook = new XSSFWorkbook(file);
+				OPCPackage pkg = OPCPackage.open(new File(this.pathFile));
+				if (isStreamingMode) {
+					// https://stackoverflow.com/questions/11891851/how-to-load-a-large-xlsx-file-with-apache-poi
+					// https://poi.apache.org/components/spreadsheet/index.html
+					workbook = new SXSSFWorkbook(new XSSFWorkbook(pkg));
+				} else {
+					workbook = new XSSFWorkbook(pkg);
+				}
+				pkg.close();
 			}
-			file.close();
 			workbook.close();
 			return workbook;
 		} catch (FileNotFoundException e) {
-			logger.error("ExcelImportSimple.createWorkBook(): {}", e.getMessage());
+			logger.error("FileNotFoundException ExcelImportSimple.createWorkBook(): {}", e.getMessage());
 		} catch (IOException e) {
-			logger.error("ExcelImportSimple.createWorkBook(): {}", e.getMessage());
+			logger.error("IOException ExcelImportSimple.createWorkBook(): {}", e.getMessage());
+		} catch (InvalidFormatException e) {
+			logger.error("InvalidFormatException ExcelImportSimple.createWorkBook(): {}", e.getMessage());
 		}
 
 		return workbook;
@@ -122,7 +137,7 @@ public class ExcelImportSimple {
 		List<PriceTableKiotVietImportDataModel> models = List.of(new PriceTableKiotVietImportDataModel());
 
 		logger.info("ExcelImportSimple.importToDatabase() starting get responseData from excel");
-		Workbook workbook = createWorkBook(pathFile);
+		Workbook workbook = createWorkBook(pathFile, false);
 		TableExcelReader excelReader = new DefaultTableExcelReader(workbook, models);
 		List<List<Object>> datas = excelReader.executeImport();
 
@@ -171,7 +186,7 @@ public class ExcelImportSimple {
 		List<PriceTableKiotVietImportDataModel> models = List.of(new PriceTableKiotVietImportDataModel());
 
 		logger.info("ExcelImportSimple.importToDatabase(int batchSize) starting get responseData from excel");
-		Workbook workbook = createWorkBook(pathFile);
+		Workbook workbook = createWorkBook(pathFile, false);
 		TableExcelReader excelReader = new DefaultTableExcelReader(workbook, models);
 		List<List<Object>> datas = excelReader.executeImport();
 
@@ -202,9 +217,10 @@ public class ExcelImportSimple {
 
 		logger.info("ExcelImportSimple.importToDatabase(int batchSize) end");
 	}
-	
+
 	/**
 	 * Using SAXParserTableExcelReader.class
+	 * 
 	 * @param batchSize
 	 */
 	public void importBigDataToDatabase(int batchSize) {
@@ -243,5 +259,51 @@ public class ExcelImportSimple {
 		}
 
 		logger.info("ExcelImportSimple.importBigDataToDatabase(int batchSize) end");
+	}
+
+	/**
+	 * {@link SXSSFWorkbook} does not support reading.
+	 * </p>
+	 * refer:
+	 * https://stackoverflow.com/questions/12513981/reading-data-from-xlsx-with-apache-pois-sxssfsheet
+	 */
+	@Deprecated
+	public void streamingImportToDatabase(int batchSize) {
+		logger.info("ExcelImportSimple.streamingImportToDatabase(int batchSize) start");
+
+		List<PriceTableKiotVietImportDataModel> models = List.of(new PriceTableKiotVietImportDataModel());
+
+		logger.info("ExcelImportSimple.streamingImportToDatabase(int batchSize) starting get responseData from excel");
+		Workbook workbook = createWorkBook(pathFile, true);
+		TableExcelReader excelReader = new DefaultTableExcelReader(workbook, models);
+		List<List<Object>> datas = excelReader.executeImport();
+
+		logger.info(
+				"ExcelImportSimple.streamingImportToDatabase() starting import responseData from excel to database");
+		// import to database
+		SqlInsert<PriceTableKiotVietTableEntity> sqlInsertCommand = new SimplePrepareStatementSqlInsert<PriceTableKiotVietTableEntity>(
+				datasource, TransactionIsolationLevel.TRANSACTION_REPEATABLE_READ);
+		// Get responseData from excel file
+		for (List<Object> tableRow : datas) {
+			// insert multi responseData with batch insert
+			List<PriceTableKiotVietTableEntity> kiotVietTableModels = new LinkedList<PriceTableKiotVietTableEntity>();
+
+			for (Object row : tableRow) {
+				PriceTableKiotVietTableEntity priceTableKiotVietTableModel = new PriceTableKiotVietTableEntity();
+				priceTableKiotVietTableModel = ObjectUtils.updateProperties(priceTableKiotVietTableModel, row);
+				kiotVietTableModels.add(priceTableKiotVietTableModel);
+			}
+
+			// Paging
+			List<List<PriceTableKiotVietTableEntity>> pagingList = paging(kiotVietTableModels, batchSize);
+
+			for (List<PriceTableKiotVietTableEntity> list : pagingList) {
+				String result = sqlInsertCommand.batchInsertValues(list, true);
+				logger.info("ExcelImportSimple.streamingImportToDatabase(int batchSize) Result {}", result);
+			}
+
+		}
+
+		logger.info("ExcelImportSimple.streamingImportToDatabase(int batchSize) end");
 	}
 }

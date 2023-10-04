@@ -7,7 +7,7 @@ import org.apache.commons.dbcp2.BasicDataSource;
 import excel.importer.ExcelImportSimple;
 
 public class Main {
-	
+
 	/**
 	 * 
 	 * @return
@@ -27,21 +27,22 @@ public class Main {
 	}
 
 	public static void main(String[] args) {
-		
+
 		String path = "C:\\Users\\DELL\\eclipse-workspace\\SimpleImportExportExcel\\BangGia_KV14082023-213536-263.xlsx";
-		
+
 		ExcelImportSimple excelImportSimple = new ExcelImportSimple(path, defaultDataSource());
-		
+
 		// excelImportSimple.importToDatabase();
-		
-	//	excelImportSimple.importToDatabase(100);
-		
+
+		// excelImportSimple.importToDatabase(100);
+
 		excelImportSimple.importBigDataToDatabase(12);
-		
-		 String log4jConfigFile = System.getProperty("user.dir")
-	                + File.separator + "log4j.xml";
-		 
-		 System.out.println(log4jConfigFile);
+		// TODO need to check next time
+		// excelImportSimple.streamingImportToDatabase(12);
+
+		String log4jConfigFile = System.getProperty("user.dir") + File.separator + "log4j.xml";
+
+		System.out.println(log4jConfigFile);
 
 	}
 

@@ -120,6 +120,7 @@ public interface TableExcelReader extends ExcelReader {
 			}
 			break;
 		case DATE:
+			// TODO maybe we need the specific date format type
 			if (rawData.isPresent() && rawData.get() instanceof Date) {
 				cellData = Optional.of(rawData.get());
 			}
@@ -180,6 +181,7 @@ public interface TableExcelReader extends ExcelReader {
 			cellData = Optional.of(Double.valueOf(rawData.get()));
 			break;
 		case DATE:
+			// TODO maybe we need the specific date format type
 			cellData = Optional.of(rawData.get());
 			break;
 		case JSON:

@@ -65,7 +65,9 @@ public class SimpleSqlInsert<T> extends AbstractSqlInsert<T> {
 
 		} catch (SQLException e) {
 			try {
-				conn.rollback();
+				if (conn != null) {
+					conn.rollback();
+				}
 			} catch (SQLException e1) {
 				logger.error("SimplePrepareStatementSqlInsert.class batchInsertValues(): {}", e1.getMessage());
 			}
@@ -127,7 +129,7 @@ public class SimpleSqlInsert<T> extends AbstractSqlInsert<T> {
 			result = statement.executeBatch();
 		} catch (SQLException e) {
 			logger.error("SimpleSqlInsert.class batchInsertValues(): {}", e.getMessage());
-			if (!isAutoCommit) {
+			if (!isAutoCommit && conn != null) {
 				try {
 					conn.rollback();
 				} catch (SQLException e1) {

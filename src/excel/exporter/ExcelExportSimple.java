@@ -37,15 +37,30 @@ public class ExcelExportSimple {
 	 * 
 	 * @param excelType
 	 */
-	public void export(ExcelType excelType) {
-
+	public void export() {
 		Logger logger = LoggerFactory.getLogger(ExcelExportSimple.class);
-
 		validateInput();
-
 		TableExcelExporter excelExporter = dataSheets.size() == 1
 				? new SimpleSingleSheetTableExcelExporter<>(fileName, dataSheets.get(0))
 				: new SimpleMultiSheetTableExcelExporter(fileName, dataSheets);
+
+		try {
+			excelExporter.out(outputPath);
+		} catch (IOException e) {
+			logger.error("ExcelExportSimple.export() {}", e.getMessage());
+		}
+	}
+
+	/**
+	 * 
+	 * @param excelType
+	 */
+	public void export(ExcelType excelType) {
+		Logger logger = LoggerFactory.getLogger(ExcelExportSimple.class);
+		validateInput();
+		TableExcelExporter excelExporter = dataSheets.size() == 1
+				? new SimpleSingleSheetTableExcelExporter<>(fileName, dataSheets.get(0), excelType)
+				: new SimpleMultiSheetTableExcelExporter(fileName, dataSheets, excelType);
 
 		try {
 			excelExporter.out(outputPath);
