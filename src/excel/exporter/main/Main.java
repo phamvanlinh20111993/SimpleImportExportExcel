@@ -62,9 +62,9 @@ public class Main {
 		excelExportSimple.setDataSheets(List.of(lists));
 		excelExportSimple.setFileName("employee");
 		excelExportSimple.setOutputPath(outputPath);
-		// excelExportSimple.export(ExcelType.SXSSF);
+		excelExportSimple.export(ExcelType.SXSSF);
 		// excelExportSimple.export(ExcelType.XLS);
-		excelExportSimple.export(ExcelType.XLSX);
+	//	excelExportSimple.export(ExcelType.XLSX);
 
 		excelExportSimple.setDataSheets(List.of(lists1));
 		excelExportSimple.setFileName("employee1");

@@ -25,6 +25,11 @@ import excel.importer.utils.CellType;
 import input.validation.handle.RowDataHandle;
 import input.validation.handle.SimpleHandleRowData;
 
+/**
+ * 
+ * @author PhamLinh
+ *
+ */
 public class SAXParserTableExcelReader extends AbstractTableExcelReader {
 
 	private static final Logger logger = LoggerFactory.getLogger(SAXParserTableExcelReader.class);
@@ -32,12 +37,12 @@ public class SAXParserTableExcelReader extends AbstractTableExcelReader {
 	private String pathFile;
 
 	protected RowDataHandle<?> rowDataHandle = new SimpleHandleRowData<>();
-	
+
 	public SAXParserTableExcelReader(String pathFile, List<?> objectTemplates) {
 		super(objectTemplates);
 		this.pathFile = pathFile;
 	}
-	
+
 	/**
 	 * 
 	 * @param saxTableData
@@ -54,7 +59,7 @@ public class SAXParserTableExcelReader extends AbstractTableExcelReader {
 		}
 		return headerFields;
 	}
-	
+
 	/**
 	 * 
 	 * @param saxTableData
@@ -92,7 +97,7 @@ public class SAXParserTableExcelReader extends AbstractTableExcelReader {
 
 		return rowDatas;
 	}
-	
+
 	/**
 	 * 
 	 * @param saxTableData
@@ -191,7 +196,8 @@ public class SAXParserTableExcelReader extends AbstractTableExcelReader {
 		List<Map<String, CellType>> configHeadersMap = this.configHeaders();
 		try {
 			RawTableExcelSAXParserReader rawTableExcelSAXParserReader = new RawTableExcelSAXParserReader();
-			// refer: https://poi.apache.org/components/spreadsheet/quick-guide.html#FileInputStream
+			// refer:
+			// https://poi.apache.org/components/spreadsheet/quick-guide.html#FileInputStream
 			rawTableExcelSAXParserReader.readExcelFile(new File(pathFile));
 
 			List<SAXTableData> saxTableDatas = rawTableExcelSAXParserReader.getSaxTableData();

@@ -28,20 +28,30 @@ public class Main {
 
 	public static void main(String[] args) {
 
-		String path = "C:\\Users\\DELL\\eclipse-workspace\\SimpleImportExportExcel\\BangGia_KV14082023-213536-263.xlsx";
+		String smallPath = "C:\\Users\\DELL\\eclipse-workspace\\SimpleImportExportExcel\\BangGia_KV14082023-213536-263-0.xlsx";
+		String bigPath = "C:\\Users\\DELL\\eclipse-workspace\\SimpleImportExportExcel\\BangGia_KV14082023-213536-263.xlsx";
 
-		ExcelImportSimple excelImportSimple = new ExcelImportSimple(path, defaultDataSource());
+		ExcelImportSimple excelImportSimple = new ExcelImportSimple(smallPath, defaultDataSource());
 
 		// excelImportSimple.importToDatabase();
 
 		// excelImportSimple.importToDatabase(100);
-
-		excelImportSimple.importBigDataToDatabase(12);
-		// TODO need to check next time
-		// excelImportSimple.streamingImportToDatabase(12);
+		long startTime = System.nanoTime();
+		ExcelImportSimple excelImportSimple1 = new ExcelImportSimple(bigPath, defaultDataSource());
+		excelImportSimple1.importBigDataToDatabase(5000);
+		
+		/**
+		 * Exception in thread "main" Exception in thread "mysql-cj-abandoned-connection-cleanup" Cleaning up unclosed ZipFile for archive C:\Users\DELL\eclipse-workspace\SimpleImportExportExcel\BangGia_KV14082023-213536-263.xlsx
+			java.lang.OutOfMemoryError: Java heap space
+			java.lang.OutOfMemoryError: Java heap space
+		 */
+		// => importToDatabase() function can not use for imort excel big data file
+		//excelImportSimple1.importToDatabase();
+		long endTime = System.nanoTime();
+		long totalTime = endTime - startTime;
+		System.out.println("Total time " + totalTime / 1000000000 + "s");
 
 		String log4jConfigFile = System.getProperty("user.dir") + File.separator + "log4j.xml";
-
 		System.out.println(log4jConfigFile);
 
 	}

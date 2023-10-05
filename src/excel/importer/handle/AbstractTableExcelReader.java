@@ -130,6 +130,7 @@ public abstract class AbstractTableExcelReader implements TableExcelReader {
 		for (Cell cell : firstRow) {
 			headerFields.put(toDataType(cell).get().toString(), cell.getColumnIndex());
 		}
+		
 		return headerFields;
 	}
 	

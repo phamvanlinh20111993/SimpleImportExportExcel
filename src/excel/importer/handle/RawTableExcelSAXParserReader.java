@@ -29,7 +29,9 @@ import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * 
- * @author PhamLinh refer:
+ * @author PhamLinh 
+ * <p/>
+ * refer:
  *         https://howtodoinjava.com/java/library/poi-read-excel-with-sax-parser/
  */
 public class RawTableExcelSAXParserReader extends DefaultHandler {
@@ -139,7 +141,7 @@ public class RawTableExcelSAXParserReader extends DefaultHandler {
 	 */
 	protected void processRow() throws ExecutionException, InterruptedException {
 		if (rowNumber == 1 && !header.isEmpty()) {
-			System.out.println("The header values are at line no. " + rowNumber + " " + "are :" + header);
+	//		System.out.println("The header values are at line no. " + rowNumber + " " + "are :" + header);
 		} else if (rowNumber > 1 && !rowValues.isEmpty()) {
 			reponseAtSheet.add(cloneHeaderData(rowValues));
 			// Get specific values here
@@ -147,7 +149,7 @@ public class RawTableExcelSAXParserReader extends DefaultHandler {
 			 * String a = rowValues.get("A"); String b = rowValues.get("B");
 			 */
 			// Print whole row
-			System.out.println("The row values are at line no. " + rowNumber + " are :" + rowValues);
+//			System.out.println("The row values are at line no. " + rowNumber + " are :" + rowValues);
 			rowValues.clear();
 		}
 	}

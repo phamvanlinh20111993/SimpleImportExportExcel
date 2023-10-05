@@ -19,6 +19,9 @@ truncate table employee;
 
 
 use fake;
+
+ Select * FROM  kiot_viet_price;
+
  DROP TABLE  kiot_viet_price;
 create table if not exists kiot_viet_price
 (
@@ -33,4 +36,6 @@ create table if not exists kiot_viet_price
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 select * from kiot_viet_price;
+
+select count(*) from kiot_viet_price;
 truncate kiot_viet_price;
