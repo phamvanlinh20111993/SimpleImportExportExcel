@@ -11,6 +11,7 @@ import javax.sql.DataSource;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
+import org.apache.poi.openxml4j.opc.PackageAccess;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
@@ -67,11 +68,11 @@ public class ExcelImportSimple {
 		// https://poi.apache.org/components/spreadsheet/quick-guide.html#FileInputStream
 		try {
 			if (extention.equals(ExcelType.XLS.getTypeValue())) {
-				POIFSFileSystem fs = new POIFSFileSystem(new File(this.pathFile));
+				POIFSFileSystem fs = new POIFSFileSystem(new File(this.pathFile), true);
 				workbook = new HSSFWorkbook(fs.getRoot(), true);
 				fs.close();
 			} else if (extention.equals(ExcelType.XLSX.getTypeValue())) {
-				OPCPackage pkg = OPCPackage.open(new File(this.pathFile));
+				OPCPackage pkg = OPCPackage.open(new File(this.pathFile), PackageAccess.READ);
 				if (isStreamingMode) {
 					// https://stackoverflow.com/questions/11891851/how-to-load-a-large-xlsx-file-with-apache-poi
 					// https://poi.apache.org/components/spreadsheet/index.html

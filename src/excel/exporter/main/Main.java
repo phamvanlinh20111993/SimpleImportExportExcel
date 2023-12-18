@@ -70,7 +70,7 @@ public class Main {
 		excelExportSimple.setFileName("employee1");
 		// excelExportSimple.setOutputPath(outputPath);
 		// excelExportSimple.export(ExcelType.XLS);
-		excelExportSimple.export(ExcelType.XLSX);
+		excelExportSimple.export(ExcelType.XLS);
 
 		List<List<?>> multiListData = new LinkedList<List<?>>();
 		multiListData.add(lists);
@@ -79,7 +79,7 @@ public class Main {
 		excelExportSimple.setDataSheets(multiListData);
 		excelExportSimple.setFileName("employee-responseData");
 		excelExportSimple.setOutputPath(outputPath);
-		excelExportSimple.export(ExcelType.XLSX);
+		excelExportSimple.export(ExcelType.SXSSF);
 
 	}
 

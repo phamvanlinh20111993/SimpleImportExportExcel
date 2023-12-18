@@ -155,7 +155,7 @@ public abstract class AbstractTableExcelReader implements TableExcelReader {
 		}
 
 		List<Map<String, Object>> rowDatas = new ArrayList<>();
-		for (int index = 1; index < sheet.getLastRowNum(); index++) {
+		for (int index = 1; index <= sheet.getLastRowNum(); index++) {
 			Map<String, Object> rowData = new LinkedHashMap<>();
 			for (Cell cell : sheet.getRow(index)) {
 				CellType cellTypeCustom = configHeader.get(invertheader.get(cell.getColumnIndex()));
