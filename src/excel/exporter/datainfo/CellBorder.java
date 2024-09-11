@@ -14,6 +14,4 @@ public class CellBorder {
 	private BorderStyle borderStyle;
 	
 	private Short borderColor;
-
-	
 }

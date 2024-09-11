@@ -28,6 +28,7 @@ import excel.exporter.datainfo.CellBorder;
 import excel.exporter.datainfo.CellInfo;
 import excel.exporter.datainfo.ColumnInfo;
 import excel.exporter.datainfo.HeaderInfo;
+import excel.exporter.datainfo.OXYCoord;
 import excel.exporter.datainfo.SheetInfo;
 import excel.exporter.datainfo.SheetInfoSetting;
 import excel.exporter.enums.HeaderNameFormatType;
@@ -43,8 +44,13 @@ public abstract class AbstractTableExcelExporter implements TableExcelExporter {
 	private Workbook workbook;
 
 	protected String fileName;
-
+	
+	// global variable used entire class
 	private Integer initialRowIndex = 0;
+	
+	private Integer tableRowIndexStart = 0;
+	
+	private Integer tableColumnIndexStart = 0;
 
 	public AbstractTableExcelExporter() {
 	}
@@ -59,6 +65,13 @@ public abstract class AbstractTableExcelExporter implements TableExcelExporter {
 		this.fileName = fileName;
 		this.workbook = createWorkBook();
 	}
+	
+	public AbstractTableExcelExporter(String fileName, ExcelType excelType, Integer tableRowIndexStart) {
+		this.excelType = excelType;
+		this.fileName = fileName;
+		this.workbook = createWorkBook();
+		this.tableRowIndexStart = tableRowIndexStart;
+	}
 
 	/**
 	 * 
@@ -66,6 +79,45 @@ public abstract class AbstractTableExcelExporter implements TableExcelExporter {
 	 * @param headerInfos
 	 */
 	protected void createHeader(Sheet sheet, List<HeaderInfo> headerInfos) {
+
+		logger.info(AbstractTableExcelExporter.class.getName() + " createHeader() start");
+
+		Row rowHead = sheet.createRow(initialRowIndex);
+		int cellIndex = 0;
+
+		for (HeaderInfo headerInfo : headerInfos) {
+			Cell cell = rowHead.createCell(cellIndex);
+			HeaderNameFormatType headerNameFormatType = headerInfo.getName().getType();
+			String headerName = headerNameFormatType.changeFormatType(headerInfo.getName().getValue());
+			cell.setCellValue(headerName);
+
+			if (ObjectUtils.isEmpty(headerInfo.getCellInfo())) {
+				cell.setCellStyle(this.defaultHeaderSetting());
+			} else {
+				cell.setCellStyle(setCellStyle(headerInfo.getCellInfo()));
+			}
+
+			if (headerInfo.getIsAutoWidth()) {
+				sheet.autoSizeColumn(cellIndex);
+			} else {
+				sheet.setColumnWidth(cellIndex, headerInfo.getWidth());
+			}
+
+			if (headerInfo.getRow() != null) {
+				rowHead.setHeight(headerInfo.getRow().getHeight());
+			}
+			cellIndex++;
+		}
+
+		logger.info(AbstractTableExcelExporter.class.getName() + " createHeader() end");
+	}
+	
+	/**
+	 * 
+	 * @param sheet
+	 * @param headerInfos
+	 */
+	protected void createHeader(Sheet sheet, List<HeaderInfo> headerInfos, OXYCoord coords) {
 
 		logger.info(AbstractTableExcelExporter.class.getName() + " createHeader() start");
 
@@ -150,6 +202,50 @@ public abstract class AbstractTableExcelExporter implements TableExcelExporter {
 		return cellStyle;
 	}
 
+	/**
+	 * 
+	 * @param sheet
+	 * @param columnInfos
+	 * @param responseData
+	 * @throws IllegalArgumentException
+	 * @throws IllegalAccessException
+	 */
+	protected void createBody(Sheet sheet, List<ColumnInfo> columnInfos, List<?> data,
+			OXYCoord coords)
+			throws IllegalArgumentException, IllegalAccessException {
+		logger.info(AbstractTableExcelExporter.class.getName() + " createBody() start");
+		int rowIndex = ++initialRowIndex;
+
+		for (Object rowData : data) {
+			Row row = sheet.createRow(rowIndex++);
+			Map<String, Object> mapData = objectToMap(rowData);
+			List<Object> listValues = new LinkedList<Object>(mapData.values());
+
+			int cellInd = 0;
+
+			for (ColumnInfo columnInfo : columnInfos) {
+				if (columnInfo.getRow() != null) {
+					row.setHeight(columnInfo.getRow().getHeight());
+				}
+				Cell cell = row.createCell(cellInd);
+				if (ObjectUtils.isEmpty(columnInfo.getCellInfo())) {
+					cell.setCellStyle(this.defaultColumnSetting());
+				} else {
+					cell.setCellStyle(setCellStyle(columnInfo.getCellInfo()));
+				}
+				setCellValue(cell, listValues.get(cellInd));
+				if (columnInfo.getIsAutoWidth()) {
+					sheet.autoSizeColumn(cellInd);
+				} else {
+					sheet.setColumnWidth(cellInd, columnInfo.getWidth());
+				}
+				cellInd++;
+			}
+		}
+
+		logger.info(AbstractTableExcelExporter.class.getName() + " createBody() end");
+	}
+	
 	/**
 	 * 
 	 * @param sheet
